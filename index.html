@@ -566,10 +566,11 @@ body::before {
 
 #easter-trigger {
   position: fixed; bottom: 34px; right: 18px;
-  font-size: 18px; cursor: none; opacity: 0.25; z-index: 20; user-select: none;
-  transition: opacity 0.2s;
+  font-size: 22px; cursor: none; opacity: 0.35; z-index: 9000; user-select: none;
+  transition: opacity 0.2s, transform 0.1s;
 }
-#easter-trigger:hover { opacity: 0.6; }
+#easter-trigger:hover { opacity: 0.7; }
+#easter-trigger.clicked { transform: scale(1.6); opacity: 1; }
 
 /* Confetti */
 #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 200; }
@@ -937,11 +938,17 @@ function spawnSteam() {
 }
 
 // ====== EASTER EGG ======
-let easterClicks = 0, easterTimer;
+let easterClicks = 0, easterTimer, easterFeedbackTimer;
 function easterClick() {
   easterClicks++;
   clearTimeout(easterTimer);
-  easterTimer = setTimeout(() => { easterClicks = 0; }, 2000);
+  easterTimer = setTimeout(() => { easterClicks = 0; }, 2500);
+
+  const el = document.getElementById('easter-trigger');
+  el.classList.add('clicked');
+  clearTimeout(easterFeedbackTimer);
+  easterFeedbackTimer = setTimeout(() => el.classList.remove('clicked'), 150);
+
   if (easterClicks >= 10) {
     easterClicks = 0;
     document.getElementById('easter-modal').style.display = 'flex';
