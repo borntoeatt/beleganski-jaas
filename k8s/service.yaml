@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: beleganski-jaas
+  labels:
+    app: beleganski-jaas
+spec:
+  selector:
+    app: beleganski-jaas
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer

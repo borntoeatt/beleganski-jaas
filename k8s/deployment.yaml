@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beleganski-jaas
+  labels:
+    app: beleganski-jaas
+    version: jacuzzi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beleganski-jaas
+  template:
+    metadata:
+      labels:
+        app: beleganski-jaas
+        version: jacuzzi
+    spec:
+      containers:
+        - name: beleganski-jaas
+          image: YOUR_REGISTRY/beleganski-jaas:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"
