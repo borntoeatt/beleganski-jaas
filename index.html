@@ -266,6 +266,9 @@ body::before {
   font-size: clamp(10px, 1.4vw, 13px);
   line-height: 1.75;
   min-height: 110px;
+  max-height: 200px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .term-line { display: block; }
@@ -802,16 +805,19 @@ function startTerminal() {
     }
   }, 42);
 
+  const termBody = document.querySelector('.terminal-body');
+  function scrollTerm() { termBody.scrollTop = termBody.scrollHeight; }
+
   function runLines() {
     LINES.forEach(line => {
       if (line.text === '') {
         setTimeout(() => {
           const el = document.createElement('span');
           el.className = 'term-line'; el.innerHTML = '&nbsp;';
-          output.appendChild(el);
+          output.appendChild(el); scrollTerm();
         }, line.delay);
       } else if (line.text === 'PROGRESS') {
-        setTimeout(() => { progWrap.style.display = 'block'; animateBar(); }, line.delay);
+        setTimeout(() => { progWrap.style.display = 'block'; scrollTerm(); animateBar(); }, line.delay);
       } else if (line.text === 'READY') {
         setTimeout(() => deployBtn.classList.add('ready'), line.delay);
       } else {
@@ -819,7 +825,7 @@ function startTerminal() {
           const el = document.createElement('span');
           el.className = 'term-line ' + (line.cls || '');
           el.textContent = line.text;
-          output.appendChild(el);
+          output.appendChild(el); scrollTerm();
         }, line.delay);
       }
     });
