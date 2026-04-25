@@ -507,7 +507,7 @@ body::before {
         <div class="stat-item"><span class="stat-value">🍴 0</span><span class="stat-label">Forks</span></div>
         <div class="stat-item"><span class="stat-value">👁 312</span><span class="stat-label">Watchers</span></div>
         <div class="stat-item"><span class="stat-value">🥃 ∞</span><span class="stat-label">Rakia</span></div>
-        <div class="stat-item"><span class="stat-value" id="visit-count">...</span><span class="stat-label">Visitors</span></div>
+        <div class="stat-item"><span class="stat-value" id="visit-count">...</span><span class="stat-label">Deploys</span></div>
       </div>
 
       <div class="readme-card">
@@ -656,11 +656,11 @@ body::before {
   }, 60);
 })();
 
-// ====== VISIT COUNTER ======
-fetch('https://api.countapi.xyz/hit/beleganski-jaas/visits')
+// ====== DEPLOYMENT COUNTER (real GitHub Actions data) ======
+fetch('https://api.github.com/repos/borntoeatt/beleganski-jaas/actions/runs?per_page=1')
   .then(r => r.json())
-  .then(d => { document.getElementById('visit-count').textContent = d.value.toLocaleString(); })
-  .catch(() => { document.getElementById('visit-count').textContent = Math.floor(Math.random()*800)+312; });
+  .then(d => { document.getElementById('visit-count').textContent = d.total_count; })
+  .catch(() => { document.getElementById('visit-count').textContent = '∞'; });
 
 // ====== LIVE STATUS CYCLING ======
 const STATUSES = [
