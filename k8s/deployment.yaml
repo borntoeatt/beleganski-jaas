@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: beleganski-jaas
-          image: dporkov/beleganski-jaas:115b3014e8bf6c75ed492f5ac9b101d129d8c4f5
+          image: dporkov/beleganski-jaas:05c00d87ef144023c2de6acd002a53c2597d74ef
           ports:
             - containerPort: 80
           resources:
