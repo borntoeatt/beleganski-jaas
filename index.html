@@ -16,6 +16,9 @@
 <meta name="twitter:description" content="JaaS — Jacuzzi as a Service 🥃">
 <meta name="twitter:image" content="https://alex-jaas.dporkov.tech/alex-jacuzzi.jpg">
 
+<!-- GoatCounter analytics -->
+<script data-goatcounter="https://dporkov.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -656,11 +659,11 @@ body::before {
   }, 60);
 })();
 
-// ====== DEPLOYMENT COUNTER (real GitHub Actions data) ======
-fetch('https://api.github.com/repos/borntoeatt/beleganski-jaas/actions/runs?per_page=1')
+// ====== VISITOR COUNTER (GoatCounter) ======
+fetch('https://dporkov.goatcounter.com/counter//.json')
   .then(r => r.json())
-  .then(d => { document.getElementById('visit-count').textContent = d.total_count; })
-  .catch(() => { document.getElementById('visit-count').textContent = '∞'; });
+  .then(d => { document.getElementById('visit-count').textContent = Number(d.count.replace(/,/g,'')).toLocaleString(); })
+  .catch(() => { document.getElementById('visit-count').textContent = '...'; });
 
 // ====== LIVE STATUS CYCLING ======
 const STATUSES = [
