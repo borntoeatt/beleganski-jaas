@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: beleganski-jaas
-          image: YOUR_REGISTRY/beleganski-jaas:latest
+          image: dporkov/beleganski-jaas:latest
           ports:
             - containerPort: 80
           resources:
