@@ -266,9 +266,6 @@ body::before {
   font-size: clamp(10px, 1.4vw, 13px);
   line-height: 1.75;
   min-height: 110px;
-  max-height: 200px;
-  overflow-y: auto;
-  scroll-behavior: smooth;
 }
 
 .term-line { display: block; }
@@ -805,8 +802,8 @@ function startTerminal() {
     }
   }, 42);
 
-  const termBody = document.querySelector('.terminal-body');
-  function scrollTerm() { termBody.scrollTop = termBody.scrollHeight; }
+  const scene1 = document.getElementById('scene1');
+  function scrollTerm() { scene1.scrollTop = scene1.scrollHeight; }
 
   function runLines() {
     LINES.forEach(line => {
