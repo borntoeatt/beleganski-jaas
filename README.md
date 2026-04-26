@@ -5,7 +5,7 @@
 [![Build & Push to Docker Hub](https://github.com/borntoeatt/beleganski-jaas/actions/workflows/deploy.yml/badge.svg)](https://github.com/borntoeatt/beleganski-jaas/actions/workflows/deploy.yml)
 ![License](https://img.shields.io/badge/license-RAKIA%20PUBLIC%20LICENSE%20v1.0-amber)
 ![Status](https://img.shields.io/badge/status-in%20jacuzzi-blue)
-![Commits by Alex](https://img.shields.io/badge/commits%20by%20alex-0-critical)
+![Commits by Alex](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Fsearch%2Fcommits%3Fq%3Drepo%3Aborntoeatt%2Fbeleganski-jaas%2Bauthor%3Aalex-beleganski&query=%24.total_count&label=commits%20by%20alex&color=critical)
 ![Docker Pulls](https://img.shields.io/docker/pulls/dporkov/beleganski-jaas)
 ![Docker Image Size](https://img.shields.io/docker/image-size/dporkov/beleganski-jaas/latest)
 ![Made with](https://img.shields.io/badge/made%20with-🥃%20rakia-orange)
