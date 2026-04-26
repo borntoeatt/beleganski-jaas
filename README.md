@@ -5,7 +5,11 @@
 [![Build & Push to Docker Hub](https://github.com/borntoeatt/beleganski-jaas/actions/workflows/deploy.yml/badge.svg)](https://github.com/borntoeatt/beleganski-jaas/actions/workflows/deploy.yml)
 ![License](https://img.shields.io/badge/license-RAKIA%20PUBLIC%20LICENSE%20v1.0-amber)
 ![Status](https://img.shields.io/badge/status-in%20jacuzzi-blue)
-![Commits](https://img.shields.io/badge/commits-1-critical)
+![Commits by Alex](https://img.shields.io/badge/commits%20by%20alex-0-critical)
+![Docker Pulls](https://img.shields.io/docker/pulls/dporkov/beleganski-jaas)
+![Docker Image Size](https://img.shields.io/docker/image-size/dporkov/beleganski-jaas/latest)
+![Made with](https://img.shields.io/badge/made%20with-🥃%20rakia-orange)
+![Reviewed from](https://img.shields.io/badge/reviewed%20from-jacuzzi-blue)
 
 ## What is this?
 
