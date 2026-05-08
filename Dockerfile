@@ -1,4 +1,4 @@
-FROM nginx:alpine
+FROM nginx:1.30-alpine-slim
 
 COPY index.html /usr/share/nginx/html/index.html
 COPY alex-rakia.jpg /usr/share/nginx/html/alex-rakia.jpg
