@@ -4,6 +4,12 @@ metadata:
   name: beleganski-jaas
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Alexander Beleganski"
+    gethomepage.dev/description: "Open source human (JaaS)"
+    gethomepage.dev/group: "Apps"
+    gethomepage.dev/icon: "mdi-account-tie"
+    gethomepage.dev/href: "https://alex-jaas.dporkov.tech"
 spec:
   ingressClassName: traefik
   rules:
