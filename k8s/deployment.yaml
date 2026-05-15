@@ -4,21 +4,27 @@ metadata:
   name: beleganski-jaas
   labels:
     app: beleganski-jaas
+    app.kubernetes.io/name: beleganski-jaas   # ADD
     version: jacuzzi
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: beleganski-jaas
+      app: beleganski-jaas        # leave unchanged (immutable)
   template:
     metadata:
       labels:
         app: beleganski-jaas
+        app.kubernetes.io/name: beleganski-jaas   # ADD - this is what Homepage looks for
         version: jacuzzi
     spec:
       containers:
         - name: beleganski-jaas
+<<<<<<< HEAD
           image: dporkov/beleganski-jaas:5df3d5d9b0db5203b4a4a3ac2169f4f6254afa47
+=======
+          image: dporkov/beleganski-jaas:57dfef510e5227af360a42285c6dae79bb8d4ed9
+>>>>>>> 07d75cf (Add app.kubernetes.io/name label for Homepage discovery)
           ports:
             - containerPort: 80
           resources:
