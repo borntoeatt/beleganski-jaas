@@ -20,11 +20,7 @@ spec:
     spec:
       containers:
         - name: beleganski-jaas
-<<<<<<< HEAD
-          image: dporkov/beleganski-jaas:5df3d5d9b0db5203b4a4a3ac2169f4f6254afa47
-=======
           image: dporkov/beleganski-jaas:57dfef510e5227af360a42285c6dae79bb8d4ed9
->>>>>>> 07d75cf (Add app.kubernetes.io/name label for Homepage discovery)
           ports:
             - containerPort: 80
           resources:
