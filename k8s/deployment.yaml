@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: beleganski-jaas   # ADD
     version: jacuzzi
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: beleganski-jaas        # leave unchanged (immutable)
