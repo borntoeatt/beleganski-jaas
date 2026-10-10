@@ -1,0 +1,19 @@
+---
+import { demoLeague, demoGoldenBoot } from '../data/site';
+const formClass = { W: 'w', D: 'd', L: 'l' } as const;
+---
+<!-- Team building league: demo rows until Supabase has data (scripts/supabase.js replaces them) -->
+<div class="section-label">⚽ Team Building League <span>— season 2025/26, drinks per event</span></div>
+<div class="pitch-card">
+  <div class="pitch-head">🏆 RAKIA PREMIER LEAGUE <span class="data-badge" id="league-badge">DEMO DATA</span></div>
+  <div class="league-scroll">
+    <table class="league-table" id="league-table">
+      <tr><th>#</th><th>Team building</th><th>Days</th><th>🥃 Drinks</th><th>Per day</th><th>Form</th><th>Pts</th></tr>
+      {demoLeague.map((t, i) => (
+        <tr><td class="pos">{i + 1}</td><td>{t.emoji} {t.name}</td><td>{t.days}</td><td>{t.drinks}</td><td>{t.perDay}</td><td><span class="form">{[...t.form].map((r) => <b class={formClass[r as keyof typeof formClass]}>{r}</b>)}</span></td><td class="pts">{t.pts}</td></tr>
+      ))}
+    </table>
+  </div>
+  <div class="league-scroll hidden" id="scorers-wrap"><table class="scorers-table" id="scorers-table"></table></div>
+  <div class="golden-boot" id="golden-boot">{demoGoldenBoot}</div>
+</div>

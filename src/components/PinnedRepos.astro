@@ -1,0 +1,15 @@
+---
+import { pinnedRepos } from '../data/site';
+---
+<div class="section-label">📌 Pinned <span>— {pinnedRepos.length} repos, 0 commits</span></div>
+<div class="pinned-grid">
+  {pinnedRepos.map((r) => (
+    <div class="repo-card">
+      <div class="repo-top"><span>📦</span><span class="repo-name">{r.name}</span><span class="repo-vis">Public</span></div>
+      <div class="repo-desc">{r.desc}</div>
+      <div class="repo-meta">
+        <span><i class="lang-dot" style={`background:${r.color}`}></i>{r.lang}</span><span>⭐ {r.stars}</span><span>🍴 0</span>
+      </div>
+    </div>
+  ))}
+</div>

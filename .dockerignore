@@ -1,0 +1,10 @@
+node_modules
+dist
+.astro
+.git
+.github
+k8s
+argocd
+supabase
+*.md
+.claude

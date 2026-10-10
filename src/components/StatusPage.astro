@@ -1,0 +1,20 @@
+---
+import { incidents } from '../data/site';
+---
+<!-- Status page: uptime bars are generated client-side (scripts/graphs.js) -->
+<div class="section-label">🛁 Status <span>— status.alex-jaas.dporkov.tech</span></div>
+<div class="status-card">
+  <div class="status-banner">✓ All jacuzzi systems operational <span>water temp: 38°C</span></div>
+  <div class="status-body" id="status-body">
+    <div class="incidents-title">Past incidents</div>
+    {incidents.map((i) => (
+      <div class={`incident ${i.kind}`}>
+        <div class="incident-title">{i.title}</div>
+        <div class="incident-text">
+          {i.updates.map(([state, text], n) => (<>{n > 0 && <br />}<b>{state}</b> — {text}</>))}
+        </div>
+        <div class="incident-date">{i.date}</div>
+      </div>
+    ))}
+  </div>
+</div>

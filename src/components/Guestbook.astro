@@ -1,0 +1,16 @@
+<!-- Guestbook -->
+<div class="section-label hidden" id="guestbook-label">💬 Guestbook <span>— leave a na zdrave for Alex</span></div>
+<div class="guestbook-card hidden" id="guestbook">
+  <form class="jaas-form hidden" id="gb-form">
+    <label>Your message <textarea name="message" maxlength="280" required placeholder="Na zdrave, Alex! 🥃"></textarea></label>
+    <div class="form-row" style="align-items:center">
+      <div class="form-msg" id="gb-msg"></div>
+      <button class="btn-primary" type="submit" style="flex:0 0 auto">Post</button>
+    </div>
+  </form>
+  <div class="gb-empty hidden" id="gb-signin">
+    <button class="btn-ghost" data-action="openAuth" data-arg="signin">Sign in</button> or
+    <button class="btn-ghost" data-action="openAuth" data-arg="register">Register</button> to post a message
+  </div>
+  <div class="guestbook-list" id="gb-list"></div>
+</div>

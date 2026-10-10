@@ -40,9 +40,9 @@ Click the rakia glass. You know what to do.
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Pure HTML/CSS/JS (no framework needed for legends) |
+| Frontend | [Astro](https://astro.build) 7, static output (still no framework at runtime, legends only) |
 | Database / Auth | Supabase (hosted Postgres + Auth, RLS) |
-| Container | nginx:alpine |
+| Container | node:22-alpine (build) → nginx:1.30-alpine-slim (serve) |
 | Registry | Docker Hub (`dporkov/beleganski-jaas`) |
 | Orchestration | k3s |
 | GitOps | ArgoCD |
@@ -73,16 +73,42 @@ GitHub Actions
 
 ## Local Development
 
+Requires Node.js 22.12+.
+
 ```bash
-# No build step needed. Just open it.
-open index.html
+npm install
+npm run dev        # http://localhost:8080 with hot reload
+npm run build      # astro check + static build into dist/
+npm run preview    # serve the built dist/
+```
+
+Or the same way production runs it:
+
+```bash
+docker build -t beleganski-jaas:dev .
+docker run --rm -p 8080:80 beleganski-jaas:dev
+```
+
+### Project structure
+
+```
+src/
+  pages/index.astro      page: puts the components together
+  layouts/Base.astro     <head>, SEO/OG tags, analytics
+  components/*.astro     one file per section (Header, League, Guestbook, AuthModal, ...)
+  data/site.ts           static content: pinned repos, demo league, incidents
+  scripts/*.js           browser code: effects, graphs, scenes, Supabase (auth, league, guestbook)
+  styles/global.css      all styles
+  config.ts              public Supabase URL + publishable key
+public/                  images, copied as-is
+supabase/migrations/     database schema (applied by CI)
 ```
 
 ## Deploy Your Own
 
 ```bash
 # Apply ArgoCD app
-kubectl apply -f https://raw.githubusercontent.com/borntoeatt/beleganski-jaas/main/k8s/argocd-app.yaml
+kubectl apply -f https://raw.githubusercontent.com/borntoeatt/beleganski-jaas/main/argocd/argocd-app.yaml
 
 # Or manually
 kubectl apply -f k8s/deployment.yaml
@@ -94,14 +120,14 @@ kubectl apply -f k8s/ingress.yaml
 
 The site stays a static nginx container. The browser talks to hosted Supabase directly using the
 **publishable (anon) key**. That key is public by design: access is enforced by the Row Level
-Security policies in `supabase/migrations/`. With an empty `config.js`, the site runs in demo mode
+Security policies in `supabase/migrations/`. With empty values in `src/config.ts`, the site builds in demo mode
 (no sign-in, hardcoded stats).
 
 | File | What it does |
 |------|-------------|
 | `supabase/migrations/*.sql` | Schema: profiles, team buildings, drink logs, ticket logs, guestbook, RLS policies, stats views |
-| `.github/workflows/supabase-migrations.yml` | Runs `supabase db push` on pushes to `main` that change migrations (or manually) |
-| `config.js` | Public Supabase URL + publishable key used by the browser |
+| `.github/workflows/supabase-migrations.yml` | PRs: `db push --dry-run`. `main`: `supabase db push` when migrations change (or manually) |
+| `src/config.ts` | Public Supabase URL + publishable key, bundled into the browser JS |
 
 One-time setup:
 
@@ -112,7 +138,7 @@ One-time setup:
    - `SUPABASE_PROJECT_REF`: the project ref (the `<ref>` in `https://<ref>.supabase.co`)
 3. **Run the migrations**: Actions → *Supabase migrations* → Run workflow (or merge a migration change to `main`).
 4. **Auth settings** (Authentication → URL Configuration): Site URL `https://alex-jaas.dporkov.tech`, and add `http://localhost:8080` to the redirect URLs for local dev. Email + password sign-up with email confirmation is the default.
-5. **Fill in `config.js`** with the project URL and publishable key and commit it. Never put the `service_role` / secret key there.
+5. **Fill in `src/config.ts`** with the project URL and publishable key and commit it. Never put the `service_role` / secret key there.
 
 Supabase's built-in email sender is heavily rate-limited and meant for testing. Configure custom SMTP
 (Authentication → Emails → SMTP) before opening registration to real users.

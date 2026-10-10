@@ -13,12 +13,14 @@ Thank you for your interest in contributing to the world's most important open s
 ```bash
 git clone https://github.com/borntoeatt/beleganski-jaas.git
 cd beleganski-jaas
-open index.html  # no build step needed, we are not animals
+npm install
+npm run dev      # http://localhost:8080 — there is a build step now, we became animals
 ```
 
 ## Development Setup
 
 Requirements:
+- Node.js 22.12+
 - A browser
 - Optionally: a jacuzzi
 - Optionally: rakia

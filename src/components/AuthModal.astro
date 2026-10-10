@@ -1,0 +1,24 @@
+<!-- Auth modal -->
+<div id="auth-modal">
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button id="tab-signin" data-action="openAuth" data-arg="signin">Sign in</button>
+      <button id="tab-register" data-action="openAuth" data-arg="register">Register</button>
+    </div>
+    <form class="jaas-form auth-body" id="auth-form">
+      <div class="auth-title hidden" id="auth-title"></div>
+      <label id="username-field">Username <input name="username" autocomplete="username" pattern="[a-zA-Z0-9][a-zA-Z0-9_\-]{2,23}" title="3-24 characters: letters, numbers, _ or -"></label>
+      <label id="email-field">Email <input name="email" type="email" autocomplete="email"></label>
+      <label id="password-field"><span id="password-label">Password</span> <input name="password" type="password" minlength="8" autocomplete="current-password"></label>
+      <button class="btn-primary" type="submit" id="auth-submit">Sign in</button>
+      <div class="form-msg" id="auth-msg"></div>
+      <button class="btn-ghost hidden" type="button" id="auth-resend-btn" data-action="resendConfirmation">Resend confirmation email</button>
+      <div class="auth-links" id="auth-links-signin">
+        <a href="#" data-action="openAuth" data-arg="forgot">Forgot password?</a> ·
+        <a href="#" data-action="openAuth" data-arg="resend">Didn't get the confirmation email?</a>
+      </div>
+      <div class="auth-links hidden" id="auth-links-back"><a href="#" data-action="openAuth" data-arg="signin">← Back to sign in</a></div>
+      <button class="btn-ghost" type="button" data-action="closeAuth">Cancel</button>
+    </form>
+  </div>
+</div>
