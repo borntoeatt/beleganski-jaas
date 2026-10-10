@@ -65,6 +65,7 @@ body::before {
   transition: opacity 0.5s;
   gap: 10px;
 }
+#scene1 > * { flex-shrink: 0; } /* keep cards full height; scene1 scrolls instead */
 
 .gh-header {
   width: 100%;
@@ -451,8 +452,143 @@ body::before {
 .cursor-trail { position: fixed; font-size: 12px; pointer-events: none; z-index: 9998; animation: trailFade 0.5s forwards; line-height: 1; }
 @keyframes trailFade { 0%{opacity:1;transform:scale(1) translateY(0)} 100%{opacity:0;transform:scale(0.3) translateY(-16px)} }
 
+/* ====== CONTRIBUTION GRAPH ====== */
+.contrib-card {
+  width: 100%; max-width: 880px;
+  background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 14px;
+}
+.contrib-head {
+  display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px;
+  font-size: clamp(11px, 1.5vw, 14px); color: #e6edf3; margin-bottom: 10px;
+}
+.contrib-head strong { color: #ffd700; }
+.contrib-sub { font-size: 11px; color: #8b949e; font-family: monospace; }
+.contrib-scroll { overflow-x: auto; padding-bottom: 4px; }
+.contrib-months, .contrib-grid { display: grid; grid-auto-flow: column; grid-auto-columns: 13px; gap: 3px; width: max-content; margin: 0 auto; }
+.contrib-months { font-size: 9px; color: #8b949e; height: 13px; margin-bottom: 2px; }
+.contrib-months span { white-space: nowrap; }
+.contrib-grid { grid-template-rows: repeat(7, 13px); }
+.contrib-cell { width: 13px; height: 13px; border-radius: 2px; outline: 1px solid rgba(255,255,255,0.04); outline-offset: -1px; }
+.contrib-cell:hover { outline: 1px solid #e6edf3; }
+.lvl0 { background: #21262d; } .lvl1 { background: #4a3206; } .lvl2 { background: #7a5207; }
+.lvl3 { background: #c8850a; } .lvl4 { background: #ffd700; }
+.contrib-legend {
+  display: flex; align-items: center; justify-content: flex-end; gap: 3px;
+  font-size: 10px; color: #8b949e; margin-top: 6px;
+}
+.contrib-legend .contrib-cell { display: inline-block; width: 11px; height: 11px; }
+
+/* ====== PINNED REPOS ====== */
+.section-label { width: 100%; max-width: 880px; font-size: 13px; color: #e6edf3; margin-top: 6px; }
+.section-label span { color: #8b949e; font-size: 11px; font-family: monospace; }
+.pinned-grid { width: 100%; max-width: 880px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.repo-card {
+  background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px; transition: border-color 0.2s, transform 0.2s;
+}
+.repo-card:hover { border-color: #c8850a; transform: translateY(-2px); }
+.repo-top { display: flex; align-items: center; gap: 8px; }
+.repo-name { color: #58a6ff; font-weight: bold; font-size: 13px; font-family: monospace; }
+.repo-vis { margin-left: auto; font-size: 10px; color: #8b949e; border: 1px solid #30363d; border-radius: 20px; padding: 0 7px; }
+.repo-desc { font-size: 11px; color: #8b949e; line-height: 1.5; flex: 1; }
+.repo-meta { display: flex; gap: 14px; font-size: 11px; color: #8b949e; align-items: center; }
+.lang-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+
+/* ====== STATUS PAGE ====== */
+.status-card { width: 100%; max-width: 880px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+.status-banner {
+  background: linear-gradient(135deg, #1f6f1f, #238636); color: #fff; padding: 10px 14px;
+  font-size: clamp(12px, 1.6vw, 15px); font-weight: bold; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+}
+.status-banner span { font-weight: normal; font-size: 11px; opacity: 0.85; font-family: monospace; }
+.status-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+.uptime-row-head { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+.uptime-row-head .pct { font-family: monospace; font-size: 11px; }
+.uptime-bars { display: flex; gap: 2px; height: 24px; }
+.uptime-bars i { flex: 1; min-width: 1px; border-radius: 2px; background: #3fb950; }
+.uptime-bars i.warn { background: #e3b341; }
+.uptime-bars i.down { background: #da3633; }
+.uptime-bars i:hover { opacity: 0.6; }
+.uptime-foot { display: flex; justify-content: space-between; font-size: 9px; color: #6e7681; margin-top: 3px; font-family: monospace; }
+.incidents-title { font-size: 12px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #30363d; padding-top: 12px; }
+.incident { border-left: 3px solid #30363d; padding: 2px 0 2px 10px; }
+.incident.major { border-color: #da3633; } .incident.minor { border-color: #e3b341; } .incident.maint { border-color: #58a6ff; }
+.incident-title { font-size: 12px; font-weight: bold; color: #e6edf3; }
+.incident-text { font-size: 11px; color: #8b949e; line-height: 1.5; margin-top: 2px; }
+.incident-text b { color: #c9d1d9; }
+.incident-date { font-size: 10px; color: #6e7681; font-family: monospace; margin-top: 2px; }
+
+/* ====== FOOTBALL STATS ====== */
+.pitch-card {
+  width: 100%; max-width: 880px; border: 1px solid #30363d; border-radius: 8px; overflow: hidden;
+  background: repeating-linear-gradient(90deg, #0f2a14 0 60px, #12321a 60px 120px);
+}
+.pitch-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: #0b1a0e; border-bottom: 2px solid #3fb950; padding: 8px 14px;
+  font-family: Impact, 'Arial Black', sans-serif; letter-spacing: 1px; color: #fff; font-size: clamp(13px, 1.8vw, 16px);
+}
+.pitch-head .live { font-family: monospace; font-size: 10px; background: #da3633; color: #fff; padding: 2px 7px; border-radius: 3px; letter-spacing: 1px; animation: cursorBlink 1.6s step-end infinite; }
+.league-scroll { overflow-x: auto; }
+.league-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 520px; }
+.league-table th {
+  text-align: center; font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px;
+  padding: 7px 6px; background: rgba(0,0,0,0.35);
+}
+.league-table td { text-align: center; padding: 7px 6px; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.25); font-family: monospace; }
+.league-table th:nth-child(2), .league-table td:nth-child(2) { text-align: left; font-family: inherit; }
+.league-table tr:first-child td { background: rgba(255,215,0,0.08); }
+.league-table .pos { color: #8b949e; width: 28px; }
+.league-table tr:nth-child(-n+2) .pos { color: #3fb950; font-weight: bold; }
+.league-table tr:last-child .pos { color: #ff7b72; font-weight: bold; }
+.league-table .pts { color: #ffd700; font-weight: bold; font-size: 13px; }
+.form { display: inline-flex; gap: 3px; }
+.form b { width: 16px; height: 16px; border-radius: 50%; font-size: 9px; line-height: 16px; color: #fff; display: inline-block; }
+.form .w { background: #238636; } .form .d { background: #6e7681; } .form .l { background: #da3633; }
+.golden-boot {
+  padding: 8px 14px; font-size: 11px; color: #e3b341; font-family: monospace; background: rgba(0,0,0,0.4);
+  border-top: 1px solid rgba(255,215,0,0.25);
+}
+
+.match-grid { display: grid; grid-template-columns: 240px 1fr; gap: 14px; padding: 14px; }
+.player-card {
+  background: linear-gradient(160deg, #f7e08b 0%, #d4a937 45%, #a67c1a 100%);
+  border-radius: 14px 14px 40px 40px; padding: 12px 12px 16px; color: #3b2a05;
+  box-shadow: 0 0 24px rgba(255,215,0,0.25); position: relative; text-align: center;
+}
+.player-rating { position: absolute; top: 10px; left: 14px; text-align: center; line-height: 1; font-family: Impact, sans-serif; }
+.player-rating .ovr { font-size: 34px; display: block; }
+.player-rating .posn { font-size: 13px; letter-spacing: 1px; }
+.player-card img { width: 110px; height: 110px; object-fit: cover; object-position: center 15%; border-radius: 50%; border: 3px solid rgba(59,42,5,0.4); margin: 4px 0 6px 30px; }
+.player-name { font-family: Impact, sans-serif; font-size: 18px; letter-spacing: 1px; border-bottom: 1px solid rgba(59,42,5,0.35); padding-bottom: 6px; margin-bottom: 8px; }
+.player-attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; font-family: Impact, sans-serif; font-size: 15px; text-align: left; white-space: nowrap; }
+.player-attrs span b { display: inline-block; width: 28px; }
+.player-attrs small { font-family: monospace; font-size: 10px; opacity: 0.75; }
+
+.stats-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel-title { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; }
+.possession { display: flex; height: 26px; border-radius: 4px; overflow: hidden; font-size: 10px; font-weight: bold; font-family: monospace; }
+.possession div { display: flex; align-items: center; justify-content: center; color: #111; white-space: nowrap; overflow: hidden; }
+.possession-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 10px; color: #c9d1d9; justify-content: center; }
+.possession-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.teams-row { display: flex; justify-content: space-between; font-family: Impact, sans-serif; font-size: 13px; letter-spacing: 1px; }
+.teams-row .home { color: #ffd700; } .teams-row .away { color: #58a6ff; }
+.cmp-row { display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; gap: 8px; }
+.cmp-val { font-family: monospace; font-size: 13px; font-weight: bold; }
+.cmp-val.home { color: #ffd700; text-align: left; } .cmp-val.away { color: #58a6ff; text-align: right; }
+.cmp-mid { display: flex; flex-direction: column; gap: 3px; }
+.cmp-label { text-align: center; font-size: 11px; color: #c9d1d9; }
+.cmp-bars { display: flex; gap: 3px; height: 7px; }
+.cmp-bars .h, .cmp-bars .a { flex: 1; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; display: flex; }
+.cmp-bars .h { justify-content: flex-end; }
+.cmp-bars .h i { background: #ffd700; border-radius: 4px; }
+.cmp-bars .a i { background: #58a6ff; border-radius: 4px; }
+
 /* ====== MOBILE ====== */
 @media (max-width: 600px) {
+  .match-grid { grid-template-columns: 1fr; }
+  .player-card { width: 100%; max-width: 250px; margin: 0 auto; }
+  .pinned-grid { grid-template-columns: 1fr; }
   .profile-row { flex-direction: column; }
   .profile-card { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; }
   .profile-avatar { width: 70px; height: 70px; }
@@ -536,6 +672,21 @@ body::before {
     </div>
   </div>
 
+  <!-- Contribution graph -->
+  <div class="contrib-card">
+    <div class="contrib-head">
+      <div><strong id="contrib-total">...</strong> rakia contributions in the last year</div>
+      <div class="contrib-sub">code contributions: 0</div>
+    </div>
+    <div class="contrib-scroll">
+      <div class="contrib-months" id="contrib-months"></div>
+      <div class="contrib-grid" id="contrib-grid"></div>
+    </div>
+    <div class="contrib-legend">
+      Sober <span class="contrib-cell lvl0"></span><span class="contrib-cell lvl1"></span><span class="contrib-cell lvl2"></span><span class="contrib-cell lvl3"></span><span class="contrib-cell lvl4"></span> Na zdrave
+    </div>
+  </div>
+
   <!-- Terminal -->
   <div class="terminal-card">
     <div class="terminal-header">
@@ -555,6 +706,115 @@ body::before {
   </div>
 
   <button id="deploy-btn" onclick="triggerReveal()">🚀 DEPLOY ALEX TO JACUZZI 🚀</button>
+
+  <!-- Pinned repos -->
+  <div class="section-label">📌 Pinned <span>— 4 repos, 0 commits</span></div>
+  <div class="pinned-grid">
+    <div class="repo-card">
+      <div class="repo-top"><span>📦</span><span class="repo-name">rakia-pipeline</span><span class="repo-vis">Public</span></div>
+      <div class="repo-desc">CI/CD for home distilling. Build fails if ABV &lt; 40%. Deploys straight to the jacuzzi.</div>
+      <div class="repo-meta"><span><i class="lang-dot" style="background:#89e051"></i>Shell</span><span>⭐ 420</span><span>🍴 0</span></div>
+    </div>
+    <div class="repo-card">
+      <div class="repo-top"><span>📦</span><span class="repo-name">jacuzzi-operator</span><span class="repo-vis">Public</span></div>
+      <div class="repo-desc">Kubernetes operator that keeps the water at 38°C. Reconciles every 5 min. Never scales down.</div>
+      <div class="repo-meta"><span><i class="lang-dot" style="background:#00add8"></i>Go</span><span>⭐ 138</span><span>🍴 0</span></div>
+    </div>
+    <div class="repo-card">
+      <div class="repo-top"><span>📦</span><span class="repo-name">standup-skipper</span><span class="repo-vis">Public</span></div>
+      <div class="repo-desc">Auto-replies "in jacuzzi, wont fix" to every standup invite. 100% test coverage (tested in jacuzzi).</div>
+      <div class="repo-meta"><span><i class="lang-dot" style="background:#3572a5"></i>Python</span><span>⭐ 97</span><span>🍴 0</span></div>
+    </div>
+    <div class="repo-card">
+      <div class="repo-top"><span>📦</span><span class="repo-name">terraform-provider-shopska</span><span class="repo-vis">Public</span></div>
+      <div class="repo-desc">Declarative shopska salad. Manages tomatoes, cucumbers and sirene as code. Requires rakia &gt;= 1.0.</div>
+      <div class="repo-meta"><span><i class="lang-dot" style="background:#844fba"></i>HCL</span><span>⭐ 64</span><span>🍴 0</span></div>
+    </div>
+  </div>
+
+  <!-- Team building league -->
+  <div class="section-label">⚽ Team Building League <span>— season 2025/26, drinks per event</span></div>
+  <div class="pitch-card">
+    <div class="pitch-head">🏆 RAKIA PREMIER LEAGUE <span class="live">● LIVE</span></div>
+    <div class="league-scroll">
+      <table class="league-table">
+        <tr><th>#</th><th>Team building</th><th>Days</th><th>🥃 Drinks</th><th>Per day</th><th>Form</th><th>Pts</th></tr>
+        <tr><td class="pos">1</td><td>⛷️ Bansko ski trip</td><td>3</td><td>64</td><td>21.3</td><td><span class="form"><b class="w">W</b><b class="w">W</b><b class="w">W</b><b class="d">D</b><b class="w">W</b></span></td><td class="pts">99</td></tr>
+        <tr><td class="pos">2</td><td>🏖️ Sozopol summer offsite</td><td>2</td><td>52</td><td>26.0</td><td><span class="form"><b class="w">W</b><b class="w">W</b><b class="d">D</b><b class="w">W</b><b class="w">W</b></span></td><td class="pts">87</td></tr>
+        <tr><td class="pos">3</td><td>🎄 Christmas party</td><td>1</td><td>38</td><td>38.0</td><td><span class="form"><b class="w">W</b><b class="w">W</b><b class="w">W</b><b class="w">W</b><b class="l">L</b></span></td><td class="pts">76</td></tr>
+        <tr><td class="pos">4</td><td>🔐 Escape room (escaped to bar)</td><td>1</td><td>21</td><td>21.0</td><td><span class="form"><b class="d">D</b><b class="w">W</b><b class="l">L</b><b class="w">W</b><b class="w">W</b></span></td><td class="pts">58</td></tr>
+        <tr><td class="pos">5</td><td>💻 Hackathon</td><td>2</td><td>19</td><td>9.5</td><td><span class="form"><b class="l">L</b><b class="d">D</b><b class="w">W</b><b class="d">D</b><b class="w">W</b></span></td><td class="pts">41</td></tr>
+        <tr><td class="pos">6</td><td>📹 Online quiz (remote, camera off)</td><td>1</td><td>11</td><td>11.0</td><td><span class="form"><b class="l">L</b><b class="l">L</b><b class="d">D</b><b class="l">L</b><b class="w">W</b></span></td><td class="pts">12</td></tr>
+      </table>
+    </div>
+    <div class="golden-boot">👟 GOLDEN BOOT: alex-beleganski — 205 drinks in 6 team buildings (34.2 per event) • 0 assists (never shares the rakia)</div>
+  </div>
+
+  <!-- Match stats -->
+  <div class="section-label">📊 Match Stats <span>— drink types &amp; drinks per ticket processed</span></div>
+  <div class="pitch-card">
+    <div class="pitch-head">ALEX 🥃 vs 🎫 JIRA BACKLOG <span class="live">● FT</span></div>
+    <div class="match-grid">
+      <div class="player-card">
+        <div class="player-rating"><span class="ovr">99</span><span class="posn">JCZ</span><br><span style="font-size:18px">🇧🇬</span></div>
+        <img src="alex-rakia.jpg" alt="Alex" onerror="this.style.visibility='hidden'">
+        <div class="player-name">BELEGANSKI</div>
+        <div class="player-attrs">
+          <span><b>99</b> RAK <small>rakia</small></span>
+          <span><b>87</b> BIR <small>beer</small></span>
+          <span><b>81</b> VIN <small>wine</small></span>
+          <span><b>74</b> MAS <small>mastika</small></span>
+          <span><b>68</b> WHI <small>whisky</small></span>
+          <span><b>03</b> H2O <small>water</small></span>
+        </div>
+      </div>
+
+      <div class="stats-panel">
+        <div class="panel-title">Drink possession</div>
+        <div class="possession">
+          <div style="width:58%;background:#ffd700">RAKIA 58%</div>
+          <div style="width:21%;background:#e3b341">BEER 21%</div>
+          <div style="width:11%;background:#ff7b72">11%</div>
+          <div style="width:7%;background:#3fb950">7%</div>
+          <div style="width:2%;background:#c77dff"></div>
+          <div style="width:1%;background:#58a6ff"></div>
+        </div>
+        <div class="possession-legend">
+          <span><i style="background:#ffd700"></i>Rakia 58%</span><span><i style="background:#e3b341"></i>Beer 21%</span>
+          <span><i style="background:#ff7b72"></i>Wine 11%</span><span><i style="background:#3fb950"></i>Mastika 7%</span>
+          <span><i style="background:#c77dff"></i>Whisky 2%</span><span><i style="background:#58a6ff"></i>Water 1% (by accident)</span>
+        </div>
+
+        <div class="panel-title" style="margin-top:4px">Head to head</div>
+        <div class="teams-row"><span class="home">ALEX</span><span class="away">AVG ENGINEER</span></div>
+        <div id="cmp-rows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status page -->
+  <div class="section-label">🛁 Status <span>— status.alex-jaas.dporkov.tech</span></div>
+  <div class="status-card">
+    <div class="status-banner">✓ All jacuzzi systems operational <span>water temp: 38°C</span></div>
+    <div class="status-body" id="status-body">
+      <div class="incidents-title">Past incidents</div>
+      <div class="incident major">
+        <div class="incident-title">🔴 Major outage: Alex detected at desk</div>
+        <div class="incident-text"><b>Investigating</b> — Monitoring reported Alex at his desk during work hours.<br><b>Resolved</b> — False alarm, it was a cardboard cutout. Alex was in the jacuzzi all along.</div>
+        <div class="incident-date">3 days ago • duration: 4 min</div>
+      </div>
+      <div class="incident minor">
+        <div class="incident-title">🟡 Degraded: water temperature dropped to 36°C</div>
+        <div class="incident-text"><b>Mitigated</b> — Added more hot water and more rakia. Temperature back to nominal.</div>
+        <div class="incident-date">2 weeks ago • duration: 12 min</div>
+      </div>
+      <div class="incident maint">
+        <div class="incident-title">🔵 Scheduled maintenance: rakia bottle rotation</div>
+        <div class="incident-text"><b>Completed</b> — Empty bottle replaced with full bottle. Zero downtime, zero sobriety.</div>
+        <div class="incident-date">recurring • every 45 min</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Ticker -->
@@ -664,6 +924,98 @@ fetch('https://dporkov.goatcounter.com/counter//.json')
   .then(r => r.json())
   .then(d => { document.getElementById('visit-count').textContent = Number(d.count.replace(/,/g,'')).toLocaleString(); })
   .catch(() => { document.getElementById('visit-count').textContent = '...'; });
+
+// ====== CONTRIBUTION GRAPH ======
+// Seeded PRNG so the graph looks the same on every visit (per day)
+function seededRand(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+(function buildContribGraph(){
+  const grid=document.getElementById('contrib-grid');
+  const months=document.getElementById('contrib-months');
+  const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const today=new Date(); today.setHours(0,0,0,0);
+  const start=new Date(today); start.setDate(start.getDate()-364-start.getDay()); // align to Sunday
+  const rand=seededRand(4269);
+  let total=0, week=0, lastMonth=-1;
+  for(let d=new Date(start); d<=today; d.setDate(d.getDate()+1)){
+    const dow=d.getDay();
+    if(dow===0){
+      if(d.getMonth()!==lastMonth){
+        const m=document.createElement('span');
+        m.style.gridColumn=(week+1)+'';
+        m.textContent=MONTHS[d.getMonth()];
+        months.appendChild(m);
+        lastMonth=d.getMonth();
+      }
+      week++;
+    }
+    // Weekends and Fridays are heavy, summer is heavier, Mondays recovering
+    let base=[0.75,0.35,0.5,0.55,0.6,0.9,0.95][dow];
+    if(d.getMonth()>=5&&d.getMonth()<=8) base+=0.1;
+    const r=rand();
+    const count=r>base?0:Math.round(Math.pow(rand(),1.5)*base*16);
+    total+=count;
+    const lvl=count===0?0:count<3?1:count<6?2:count<10?3:4;
+    const cell=document.createElement('div');
+    cell.className='contrib-cell lvl'+lvl;
+    cell.style.gridRow=(dow+1)+'';
+    cell.style.gridColumn=week+'';
+    cell.title=(count===0?'No rakia (suspicious)':count+' rakia')+' on '+DAYS[dow]+', '+MONTHS[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+    grid.appendChild(cell);
+  }
+  document.getElementById('contrib-total').textContent=total.toLocaleString();
+  const sc=grid.parentElement; sc.scrollLeft=sc.scrollWidth; // show most recent weeks first on small screens
+})();
+
+// ====== STATUS PAGE UPTIME BARS ======
+(function buildUptime(){
+  const body=document.getElementById('status-body');
+  const anchor=body.querySelector('.incidents-title');
+  const rand=seededRand(1337);
+  const COMPONENTS=[
+    { name:'🛁 Jacuzzi',            p:()=>'' },
+    { name:'🥃 Rakia supply',       p:i=>i===62?'warn':'' },
+    { name:'🧍 Standup attendance', p:()=>rand()<0.96?'down':(rand()<0.5?'warn':'') },
+    { name:'💻 Desk presence',      p:()=>'down' },
+  ];
+  COMPONENTS.forEach(c=>{
+    const states=Array.from({length:90},(_,i)=>c.p(i));
+    const up=states.filter(s=>s==='').length + states.filter(s=>s==='warn').length*0.5;
+    const pct=(up/90*100);
+    const color=pct>99?'#3fb950':pct>50?'#e3b341':'#ff7b72';
+    const row=document.createElement('div');
+    row.innerHTML=
+      `<div class="uptime-row-head"><span>${c.name}</span><span class="pct" style="color:${color}">${pct.toFixed(2)}% uptime</span></div>`+
+      `<div class="uptime-bars">${states.map((s,i)=>`<i class="${s}" title="${90-i} days ago: ${s==='down'?'outage':s==='warn'?'degraded':'operational'}"></i>`).join('')}</div>`+
+      `<div class="uptime-foot"><span>90 days ago</span><span>today</span></div>`;
+    body.insertBefore(row,anchor);
+  });
+})();
+
+// ====== MATCH STATS (head to head) ======
+(function buildMatchStats(){
+  const STATS=[
+    { label:'🎫 Tickets processed',           home:3,    away:41 },
+    { label:'🥃 Drinks per ticket processed', home:47.3, away:0.2 },
+    { label:'⚽ xD (expected drinks)',         home:142,  away:8 },
+    { label:'🎯 Shots on target (rakia)',     home:118,  away:5 },
+    { label:'🧍 Standups attended',           home:0,    away:58 },
+    { label:'🟨 Yellow cards (HR tickets)',   home:12,   away:0 },
+  ];
+  const wrap=document.getElementById('cmp-rows');
+  STATS.forEach(s=>{
+    const max=Math.max(s.home,s.away)||1;
+    const row=document.createElement('div');
+    row.className='cmp-row';
+    row.innerHTML=
+      `<span class="cmp-val home">${s.home}</span>`+
+      `<div class="cmp-mid"><div class="cmp-label">${s.label}</div>`+
+      `<div class="cmp-bars"><span class="h"><i style="width:${s.home/max*100}%"></i></span><span class="a"><i style="width:${s.away/max*100}%"></i></span></div></div>`+
+      `<span class="cmp-val away">${s.away}</span>`;
+    wrap.appendChild(row);
+  });
+  wrap.style.cssText='display:flex;flex-direction:column;gap:9px';
+})();
 
 // ====== LIVE STATUS CYCLING ======
 const STATUSES = [
@@ -782,7 +1134,7 @@ function startTerminal() {
   const progText=document.getElementById('progress-text');
   const deployBtn=document.getElementById('deploy-btn');
   const scene1el=document.getElementById('scene1');
-  function scrollTerm(){ scene1el.scrollTop=scene1el.scrollHeight; }
+  function scrollTerm(){ deployBtn.scrollIntoView({block:'nearest'}); }
 
   let i=0;
   const typer=setInterval(()=>{
