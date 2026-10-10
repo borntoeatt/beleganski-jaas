@@ -11,4 +11,6 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+  # Kept as NodePort until it's confirmed nothing (e.g. Nginx Proxy Manager) targets the node port
+  # directly; traffic via the Traefik Ingress only needs ClusterIP.
   type: NodePort

@@ -4,14 +4,21 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'k8s/deployment.yaml'
+    paths-ignore:          # infra-only changes don't need a new image
+      - 'k8s/**'
+      - 'argocd/**'
       - 'supabase/**'
   # PRs: build the image (incl. `astro check` + `astro build`) without pushing or deploying
   pull_request:
     paths-ignore:
-      - 'k8s/deployment.yaml'
+      - 'k8s/**'
+      - 'argocd/**'
       - 'supabase/**'
+
+# One run at a time per branch: main builds queue (never cancelled), PR builds cancel stale ones
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build-and-push:
@@ -44,16 +51,23 @@ jobs:
             dporkov/beleganski-jaas:latest
             dporkov/beleganski-jaas:${{ github.sha }}
 
-      - name: Update image tag in deployment
+      # Only k8s/kustomization.yaml is touched, so this can't conflict with edits to other manifests
+      - name: Update image tag in kustomization
         if: env.PUSH == 'true'
         run: |
-          sed -i "s|dporkov/beleganski-jaas:.*|dporkov/beleganski-jaas:${{ github.sha }}|" k8s/deployment.yaml
+          sed -i -E "s|^(\s*newTag:).*|\1 ${{ github.sha }}|" k8s/kustomization.yaml
+          grep -q "newTag: ${{ github.sha }}" k8s/kustomization.yaml
 
-      - name: Commit and push updated deployment
+      - name: Commit and push image tag
         if: env.PUSH == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add k8s/deployment.yaml
-          git commit -m "ci: update image to ${{ github.sha }}" || echo "No changes to commit"
-          git push
+          git add k8s/kustomization.yaml
+          git commit -m "ci: update image to ${{ github.sha }}" || { echo "No changes to commit"; exit 0; }
+          # main may have moved while the image was building: rebase onto it and retry
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && exit 0
+            sleep $((i * 5))
+          done
+          exit 1

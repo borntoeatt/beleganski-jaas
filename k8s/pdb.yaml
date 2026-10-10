@@ -1,0 +1,12 @@
+# Keep at least one pod running during voluntary disruptions (node drains, k3s/Proxmox maintenance)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: beleganski-jaas
+  labels:
+    app: beleganski-jaas
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: beleganski-jaas

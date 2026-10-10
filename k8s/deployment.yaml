@@ -4,25 +4,56 @@ metadata:
   name: beleganski-jaas
   labels:
     app: beleganski-jaas
-    app.kubernetes.io/name: beleganski-jaas   # ADD
+    app.kubernetes.io/name: beleganski-jaas
     version: jacuzzi
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: beleganski-jaas        # leave unchanged (immutable)
+      app: beleganski-jaas        # immutable, do not change
   template:
     metadata:
       labels:
         app: beleganski-jaas
-        app.kubernetes.io/name: beleganski-jaas   # ADD - this is what Homepage looks for
+        app.kubernetes.io/name: beleganski-jaas   # Homepage discovery
         version: jacuzzi
     spec:
+      # Spread replicas across nodes; still schedules if there are fewer nodes than replicas
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: beleganski-jaas
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: beleganski-jaas
-          image: dporkov/beleganski-jaas:0e28948cf358fe034c6ef39bc348b653192aff0c
+          # Tag is set by CI in k8s/kustomization.yaml (images: newTag)
+          image: dporkov/beleganski-jaas
           ports:
-            - containerPort: 80
+            - name: http
+              containerPort: 80
+            - name: http-alt          # same site; the Service moves here when switching to non-root nginx
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
           resources:
             requests:
               memory: "32Mi"

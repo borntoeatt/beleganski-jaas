@@ -59,13 +59,13 @@ git push
 GitHub Actions
    ├── builds linux/amd64 Docker image
    ├── pushes dporkov/beleganski-jaas:<sha>
-   └── updates k8s/deployment.yaml with new SHA
+   └── sets newTag: <sha> in k8s/kustomization.yaml (rebases first, touches nothing else)
          │
          ▼
        ArgoCD detects manifest change
          │
          ▼
-       k3s pulls new image & restarts pod
+       k3s rolls out 3 replicas (readiness probes, PDB keeps ≥1 up)
          │
          ▼
        alex-jaas.dporkov.tech 🥃
@@ -110,10 +110,8 @@ supabase/migrations/     database schema (applied by CI)
 # Apply ArgoCD app
 kubectl apply -f https://raw.githubusercontent.com/borntoeatt/beleganski-jaas/main/argocd/argocd-app.yaml
 
-# Or manually
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-kubectl apply -f k8s/ingress.yaml
+# Or manually (Kustomize: applies deployment, service, ingress, PDB with the current image tag)
+kubectl apply -k k8s/
 ```
 
 ## Supabase setup (accounts, league, guestbook)
