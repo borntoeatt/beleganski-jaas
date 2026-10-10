@@ -16,6 +16,10 @@
 <meta name="twitter:description" content="JaaS — Jacuzzi as a Service 🥃">
 <meta name="twitter:image" content="https://alex-jaas.dporkov.tech/alex-jacuzzi.jpg">
 
+<!-- Supabase (accounts, league, guestbook). Empty config.js = static demo mode -->
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+
 <!-- GoatCounter analytics -->
 <script data-goatcounter="https://dporkov.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
@@ -584,8 +588,77 @@ body::before {
 .cmp-bars .h i { background: #ffd700; border-radius: 4px; }
 .cmp-bars .a i { background: #58a6ff; border-radius: 4px; }
 
+/* ====== ACCOUNTS (Supabase) ====== */
+.auth-btn { background: #238636; border-color: #2ea043; color: #fff; }
+.auth-btn:hover { background: #2ea043; }
+.user-chip { font-family: monospace; font-size: 12px; color: #e3b341; }
+.hidden { display: none !important; }
+
+#auth-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 8500;
+  display: none; align-items: center; justify-content: center; padding: 16px;
+}
+#auth-modal.show { display: flex; }
+.auth-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; width: 100%; max-width: 360px; overflow: hidden; }
+.auth-tabs { display: flex; border-bottom: 1px solid #30363d; }
+.auth-tabs button {
+  flex: 1; background: none; border: none; color: #8b949e; padding: 12px; font-size: 13px; font-family: inherit;
+  cursor: pointer; border-bottom: 2px solid transparent;
+}
+.auth-tabs button.active { color: #e6edf3; border-bottom-color: #f78166; }
+.auth-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+.jaas-form label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #8b949e; }
+.jaas-form input, .jaas-form select, .jaas-form textarea {
+  background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3;
+  padding: 7px 9px; font-size: 13px; font-family: inherit; cursor: text; width: 100%;
+}
+.jaas-form select { cursor: pointer; }
+.jaas-form input:focus, .jaas-form select:focus, .jaas-form textarea:focus { outline: none; border-color: #58a6ff; box-shadow: 0 0 0 2px rgba(88,166,255,0.2); }
+.jaas-form textarea { resize: vertical; min-height: 56px; }
+.btn-primary {
+  background: #238636; color: #fff; border: 1px solid #2ea043; border-radius: 6px;
+  padding: 8px 14px; font-size: 13px; font-weight: bold; font-family: inherit; cursor: pointer;
+}
+.btn-primary:hover { background: #2ea043; }
+.btn-primary:disabled { opacity: 0.5; cursor: wait; }
+.btn-ghost { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 7px 12px; font-size: 12px; font-family: inherit; cursor: pointer; }
+.btn-ghost:hover { background: #30363d; }
+.form-msg { font-size: 12px; font-family: monospace; line-height: 1.5; min-height: 0; }
+.form-msg.err { color: #ff7b72; } .form-msg.ok { color: #3fb950; }
+
+.locker-card { width: 100%; max-width: 880px; background: #161b22; border: 1px solid #c8850a; border-radius: 8px; overflow: hidden; }
+.locker-head { background: rgba(200,133,10,0.15); padding: 9px 14px; font-size: 13px; color: #e3b341; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.locker-head span { font-family: monospace; font-size: 11px; color: #c9d1d9; }
+.locker-body { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; padding: 14px; }
+.locker-body form { display: flex; flex-direction: column; gap: 8px; }
+.form-row { display: flex; gap: 8px; }
+.form-row > * { flex: 1; min-width: 0; }
+.form-title { font-size: 12px; color: #e6edf3; font-weight: bold; }
+details.new-tb summary { font-size: 11px; color: #58a6ff; cursor: pointer; }
+details.new-tb form { margin-top: 8px; }
+
+.scorers-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.scorers-table th { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; padding: 6px; text-align: center; background: rgba(0,0,0,0.35); }
+.scorers-table td { padding: 6px; text-align: center; font-family: monospace; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.25); }
+.scorers-table td:nth-child(2), .scorers-table th:nth-child(2) { text-align: left; }
+.scorers-table tr.me td { background: rgba(88,166,255,0.12); }
+
+.guestbook-card { width: 100%; max-width: 880px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.guestbook-list { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+.gb-item { border: 1px solid #30363d; border-radius: 8px; padding: 8px 12px; background: #0d1117; }
+.gb-meta { display: flex; gap: 8px; align-items: center; font-size: 11px; color: #8b949e; font-family: monospace; }
+.gb-meta strong { color: #58a6ff; }
+.gb-del { margin-left: auto; background: none; border: none; color: #8b949e; cursor: pointer; font-size: 12px; }
+.gb-del:hover { color: #ff7b72; }
+.gb-msg { font-size: 13px; color: #e6edf3; margin-top: 4px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.gb-empty { font-size: 12px; color: #8b949e; font-family: monospace; text-align: center; padding: 12px; }
+.data-badge { font-size: 9px; font-family: monospace; padding: 1px 6px; border-radius: 3px; background: #21262d; color: #8b949e; border: 1px solid #30363d; letter-spacing: 1px; }
+.data-badge.live { background: #0f3d1f; color: #3fb950; border-color: #238636; }
+
 /* ====== MOBILE ====== */
 @media (max-width: 600px) {
+  .locker-body { grid-template-columns: 1fr; }
   .match-grid { grid-template-columns: 1fr; }
   .player-card { width: 100%; max-width: 250px; margin: 0 auto; }
   .pinned-grid { grid-template-columns: 1fr; }
@@ -622,6 +695,9 @@ body::before {
     </span>
     <span class="gh-badge" id="live-status">🟢 Available (in jacuzzi)</span>
     <button class="fork-btn" onclick="showForkError()">🍴 Fork</button>
+    <button class="fork-btn auth-btn hidden" id="signin-btn" onclick="openAuth('signin')">Sign in</button>
+    <span class="user-chip hidden" id="user-chip"></span>
+    <button class="fork-btn hidden" id="signout-btn" onclick="signOut()">Sign out</button>
   </div>
 
   <div class="profile-row">
@@ -732,12 +808,58 @@ body::before {
     </div>
   </div>
 
+  <!-- Locker room: logging for signed-in players -->
+  <div class="locker-card hidden" id="locker">
+    <div class="locker-head">🎽 Locker room — log your stats <span id="locker-me"></span></div>
+    <div class="locker-body">
+      <div>
+        <form class="jaas-form" id="drink-form">
+          <div class="form-title">🥃 Log drinks</div>
+          <div class="form-row">
+            <label>Drink
+              <select name="drink_type">
+                <option value="rakia">🥃 Rakia</option><option value="beer">🍺 Beer</option>
+                <option value="wine">🍷 Wine</option><option value="mastika">🌿 Mastika</option>
+                <option value="whisky">🥃 Whisky</option><option value="water">💧 Water</option>
+                <option value="other">🍹 Other</option>
+              </select>
+            </label>
+            <label>Quantity <input name="quantity" type="number" min="1" max="20" value="1" required></label>
+          </div>
+          <label>Team building (optional)
+            <select name="team_building_id" id="tb-select"><option value="">— regular work day —</option></select>
+          </label>
+          <button class="btn-primary" type="submit">Log drinks</button>
+          <div class="form-msg" id="drink-msg"></div>
+        </form>
+        <details class="new-tb">
+          <summary>＋ Add a team building</summary>
+          <form class="jaas-form" id="tb-form">
+            <div class="form-row">
+              <label style="flex:0 0 70px">Emoji <input name="emoji" maxlength="8" value="🍻"></label>
+              <label>Name <input name="name" minlength="2" maxlength="60" required placeholder="Bansko ski trip"></label>
+              <label style="flex:0 0 70px">Days <input name="days" type="number" min="1" max="14" value="1" required></label>
+            </div>
+            <button class="btn-ghost" type="submit">Add team building</button>
+            <div class="form-msg" id="tb-msg"></div>
+          </form>
+        </details>
+      </div>
+      <form class="jaas-form" id="ticket-form">
+        <div class="form-title">🎫 Log tickets processed</div>
+        <label>Tickets <input name="tickets" type="number" min="1" max="100" value="1" required></label>
+        <button class="btn-primary" type="submit">Log tickets</button>
+        <div class="form-msg" id="ticket-msg"></div>
+      </form>
+    </div>
+  </div>
+
   <!-- Team building league -->
   <div class="section-label">⚽ Team Building League <span>— season 2025/26, drinks per event</span></div>
   <div class="pitch-card">
-    <div class="pitch-head">🏆 RAKIA PREMIER LEAGUE <span class="live">● LIVE</span></div>
+    <div class="pitch-head">🏆 RAKIA PREMIER LEAGUE <span class="data-badge" id="league-badge">DEMO DATA</span></div>
     <div class="league-scroll">
-      <table class="league-table">
+      <table class="league-table" id="league-table">
         <tr><th>#</th><th>Team building</th><th>Days</th><th>🥃 Drinks</th><th>Per day</th><th>Form</th><th>Pts</th></tr>
         <tr><td class="pos">1</td><td>⛷️ Bansko ski trip</td><td>3</td><td>64</td><td>21.3</td><td><span class="form"><b class="w">W</b><b class="w">W</b><b class="w">W</b><b class="d">D</b><b class="w">W</b></span></td><td class="pts">99</td></tr>
         <tr><td class="pos">2</td><td>🏖️ Sozopol summer offsite</td><td>2</td><td>52</td><td>26.0</td><td><span class="form"><b class="w">W</b><b class="w">W</b><b class="d">D</b><b class="w">W</b><b class="w">W</b></span></td><td class="pts">87</td></tr>
@@ -747,7 +869,8 @@ body::before {
         <tr><td class="pos">6</td><td>📹 Online quiz (remote, camera off)</td><td>1</td><td>11</td><td>11.0</td><td><span class="form"><b class="l">L</b><b class="l">L</b><b class="d">D</b><b class="l">L</b><b class="w">W</b></span></td><td class="pts">12</td></tr>
       </table>
     </div>
-    <div class="golden-boot">👟 GOLDEN BOOT: alex-beleganski — 205 drinks in 6 team buildings (34.2 per event) • 0 assists (never shares the rakia)</div>
+    <div class="league-scroll hidden" id="scorers-wrap"><table class="scorers-table" id="scorers-table"></table></div>
+    <div class="golden-boot" id="golden-boot">👟 GOLDEN BOOT: alex-beleganski — 205 drinks in 6 team buildings (34.2 per event) • 0 assists (never shares the rakia)</div>
   </div>
 
   <!-- Match stats -->
@@ -771,7 +894,7 @@ body::before {
 
       <div class="stats-panel">
         <div class="panel-title">Drink possession</div>
-        <div class="possession">
+        <div class="possession" id="possession">
           <div style="width:58%;background:#ffd700">RAKIA 58%</div>
           <div style="width:21%;background:#e3b341">BEER 21%</div>
           <div style="width:11%;background:#ff7b72">11%</div>
@@ -779,17 +902,34 @@ body::before {
           <div style="width:2%;background:#c77dff"></div>
           <div style="width:1%;background:#58a6ff"></div>
         </div>
-        <div class="possession-legend">
+        <div class="possession-legend" id="possession-legend">
           <span><i style="background:#ffd700"></i>Rakia 58%</span><span><i style="background:#e3b341"></i>Beer 21%</span>
           <span><i style="background:#ff7b72"></i>Wine 11%</span><span><i style="background:#3fb950"></i>Mastika 7%</span>
           <span><i style="background:#c77dff"></i>Whisky 2%</span><span><i style="background:#58a6ff"></i>Water 1% (by accident)</span>
         </div>
 
         <div class="panel-title" style="margin-top:4px">Head to head</div>
-        <div class="teams-row"><span class="home">ALEX</span><span class="away">AVG ENGINEER</span></div>
+        <div class="teams-row"><span class="home" id="h2h-home">ALEX</span><span class="away" id="h2h-away">AVG ENGINEER</span></div>
         <div id="cmp-rows"></div>
       </div>
     </div>
+  </div>
+
+  <!-- Guestbook -->
+  <div class="section-label hidden" id="guestbook-label">💬 Guestbook <span>— leave a na zdrave for Alex</span></div>
+  <div class="guestbook-card hidden" id="guestbook">
+    <form class="jaas-form hidden" id="gb-form">
+      <label>Your message <textarea name="message" maxlength="280" required placeholder="Na zdrave, Alex! 🥃"></textarea></label>
+      <div class="form-row" style="align-items:center">
+        <div class="form-msg" id="gb-msg"></div>
+        <button class="btn-primary" type="submit" style="flex:0 0 auto">Post</button>
+      </div>
+    </form>
+    <div class="gb-empty hidden" id="gb-signin">
+      <button class="btn-ghost" onclick="openAuth('signin')">Sign in</button> or
+      <button class="btn-ghost" onclick="openAuth('register')">Register</button> to post a message
+    </div>
+    <div class="guestbook-list" id="gb-list"></div>
   </div>
 
   <!-- Status page -->
@@ -896,6 +1036,24 @@ body::before {
       </div>
       <button id="close-hr" onclick="closeHR()" style="display:none">close ticket</button>
     </div>
+  </div>
+</div>
+
+<!-- Auth modal -->
+<div id="auth-modal" onclick="if(event.target===this)closeAuth()">
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button id="tab-signin" onclick="openAuth('signin')">Sign in</button>
+      <button id="tab-register" onclick="openAuth('register')">Register</button>
+    </div>
+    <form class="jaas-form auth-body" id="auth-form">
+      <label id="username-field">Username <input name="username" autocomplete="username" pattern="[a-zA-Z0-9][a-zA-Z0-9_\-]{2,23}" title="3-24 characters: letters, numbers, _ or -"></label>
+      <label>Email <input name="email" type="email" autocomplete="email" required></label>
+      <label>Password <input name="password" type="password" minlength="8" autocomplete="current-password" required></label>
+      <button class="btn-primary" type="submit" id="auth-submit">Sign in</button>
+      <div class="form-msg" id="auth-msg"></div>
+      <button class="btn-ghost" type="button" onclick="closeAuth()">Cancel</button>
+    </form>
   </div>
 </div>
 
@@ -1329,6 +1487,220 @@ function animateConfetti(){
   else ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 function stopConfetti(){ confettiRunning=false; }
+
+// ====== SUPABASE: accounts, league, guestbook ======
+// Static demo mode when config.js is empty or the library failed to load.
+const CFG = window.JAAS_CONFIG || {};
+const sb = (CFG.supabaseUrl && CFG.supabaseKey && window.supabase)
+  ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey) : null;
+let me = null; // { id, username }
+
+const DRINK_META = {
+  rakia:{label:'Rakia',color:'#ffd700'}, beer:{label:'Beer',color:'#e3b341'}, wine:{label:'Wine',color:'#ff7b72'},
+  mastika:{label:'Mastika',color:'#3fb950'}, whisky:{label:'Whisky',color:'#c77dff'}, water:{label:'Water',color:'#58a6ff'},
+  other:{label:'Other',color:'#8b949e'},
+};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function setMsg(id, text, ok){ const el=document.getElementById(id); el.textContent=text||''; el.className='form-msg '+(ok?'ok':'err'); }
+function timeAgo(ts){
+  const s=Math.max(1,Math.floor((Date.now()-new Date(ts))/1000));
+  for (const [n,u] of [[86400,'d'],[3600,'h'],[60,'m']]) if (s>=n) return Math.floor(s/n)+u+' ago';
+  return s+'s ago';
+}
+
+// ---- auth ----
+let authMode='signin';
+function openAuth(mode){
+  if(!sb) return;
+  authMode=mode;
+  document.getElementById('auth-modal').classList.add('show');
+  document.getElementById('tab-signin').classList.toggle('active', mode==='signin');
+  document.getElementById('tab-register').classList.toggle('active', mode==='register');
+  document.getElementById('username-field').classList.toggle('hidden', mode!=='register');
+  document.querySelector('#auth-form [name=username]').required = mode==='register';
+  document.querySelector('#auth-form [name=password]').autocomplete = mode==='register'?'new-password':'current-password';
+  document.getElementById('auth-submit').textContent = mode==='register'?'Create account':'Sign in';
+  setMsg('auth-msg','');
+}
+function closeAuth(){ document.getElementById('auth-modal').classList.remove('show'); }
+async function signOut(){ if(sb) await sb.auth.signOut(); }
+
+document.getElementById('auth-form').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const f=e.target, btn=document.getElementById('auth-submit');
+  const email=f.email.value.trim(), password=f.password.value;
+  btn.disabled=true; setMsg('auth-msg','');
+  try {
+    if(authMode==='register'){
+      const username=f.username.value.trim().toLowerCase();
+      const { data: taken } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+      if(taken) throw new Error('Username already taken');
+      const { data, error } = await sb.auth.signUp({ email, password,
+        options:{ data:{ username }, emailRedirectTo: location.origin + location.pathname } });
+      if(error) throw error;
+      if(!data.session){ setMsg('auth-msg','✓ Account created. Check your email to confirm, then sign in.', true); return; }
+    } else {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+    }
+    f.reset(); closeAuth();
+  } catch(err){
+    setMsg('auth-msg', '✗ '+(err.message||'Something went wrong'));
+  } finally { btn.disabled=false; }
+});
+
+async function onSession(session){
+  me=null;
+  if(session){
+    const { data } = await sb.from('profiles').select('id,username').eq('id', session.user.id).maybeSingle();
+    me = data || { id: session.user.id, username: session.user.email };
+  }
+  document.getElementById('signin-btn').classList.toggle('hidden', !!me);
+  document.getElementById('signout-btn').classList.toggle('hidden', !me);
+  const chip=document.getElementById('user-chip');
+  chip.classList.toggle('hidden', !me); chip.textContent = me ? '@'+me.username : '';
+  document.getElementById('locker').classList.toggle('hidden', !me);
+  document.getElementById('locker-me').textContent = me ? 'playing as @'+me.username : '';
+  document.getElementById('gb-form').classList.toggle('hidden', !me);
+  document.getElementById('gb-signin').classList.toggle('hidden', !!me);
+  loadAll();
+}
+
+// ---- data: league, scorers, possession, head-to-head ----
+async function loadLeague(){
+  const [lt, ps] = await Promise.all([
+    sb.from('league_table').select('*').order('drinks',{ascending:false}),
+    sb.from('player_stats').select('*').order('drinks',{ascending:false}).limit(10),
+  ]);
+  if(lt.error||ps.error) throw (lt.error||ps.error);
+  const tbs=lt.data, players=ps.data.filter(p=>p.drinks>0||p.tickets>0);
+
+  const sel=document.getElementById('tb-select'), cur=sel.value;
+  sel.innerHTML='<option value="">— regular work day —</option>'+
+    tbs.map(t=>`<option value="${t.id}">${esc(t.emoji)} ${esc(t.name)}</option>`).join('');
+  sel.value=cur;
+
+  if(!tbs.length && !players.length) return; // nothing logged yet: keep the demo table
+  document.getElementById('league-badge').textContent='● LIVE';
+  document.getElementById('league-badge').classList.add('live');
+  document.getElementById('league-table').innerHTML =
+    '<tr><th>#</th><th>Team building</th><th>Days</th><th>🥃 Drinks</th><th>Per day</th><th>Players</th></tr>'+
+    (tbs.length ? tbs.map((t,i)=>`<tr><td class="pos">${i+1}</td><td>${esc(t.emoji)} ${esc(t.name)}</td><td>${t.days}</td><td>${t.drinks}</td><td>${t.per_day}</td><td class="pts">${t.players}</td></tr>`).join('')
+                : '<tr><td colspan="6" style="color:#8b949e">No team buildings yet. Add one in the locker room.</td></tr>');
+
+  const wrap=document.getElementById('scorers-wrap');
+  wrap.classList.toggle('hidden', !players.length);
+  document.getElementById('scorers-table').innerHTML =
+    '<tr><th>#</th><th>Top scorers</th><th>🥃 Drinks</th><th>🎫 Tickets</th><th>Drinks / ticket</th></tr>'+
+    players.map((p,i)=>`<tr class="${me&&p.id===me.id?'me':''}"><td class="pos">${i+1}</td><td>@${esc(p.username)}</td><td>${p.drinks}</td><td>${p.tickets}</td><td>${p.drinks_per_ticket ?? '∞'}</td></tr>`).join('');
+  if(players.length){
+    const top=players[0], total=players.reduce((a,p)=>a+p.drinks,0);
+    document.getElementById('golden-boot').textContent =
+      `👟 GOLDEN BOOT: @${top.username} — ${top.drinks} drinks • league total: ${total} drinks across ${players.length} players`;
+    renderHeadToHead(players);
+  }
+}
+
+function renderHeadToHead(players){
+  const mine = me && players.find(p=>p.id===me.id);
+  const home = mine || players[0];
+  const others = players.filter(p=>p.id!==home.id);
+  if(!others.length) return; // nothing to compare against yet
+  const avg = k => +(others.reduce((a,p)=>a+(+p[k]||0),0)/others.length).toFixed(1);
+  const dpt = p => p.tickets ? +(p.drinks/p.tickets).toFixed(1) : p.drinks;
+  document.getElementById('h2h-home').textContent = '@'+home.username.toUpperCase();
+  document.getElementById('h2h-away').textContent = 'LEAGUE AVG';
+  const rows=[
+    { label:'🎫 Tickets processed',           home:home.tickets, away:avg('tickets') },
+    { label:'🥃 Drinks',                       home:home.drinks,  away:avg('drinks') },
+    { label:'🥃 Drinks per ticket processed', home:dpt(home),    away:+(others.reduce((a,p)=>a+dpt(p),0)/others.length).toFixed(1) },
+  ];
+  document.getElementById('cmp-rows').innerHTML = rows.map(s=>{
+    const max=Math.max(s.home,s.away)||1;
+    return `<div class="cmp-row"><span class="cmp-val home">${s.home}</span><div class="cmp-mid"><div class="cmp-label">${s.label}</div>`+
+      `<div class="cmp-bars"><span class="h"><i style="width:${s.home/max*100}%"></i></span><span class="a"><i style="width:${s.away/max*100}%"></i></span></div></div>`+
+      `<span class="cmp-val away">${s.away}</span></div>`;
+  }).join('');
+}
+
+async function loadPossession(){
+  const { data, error } = await sb.from('drink_type_stats').select('*').order('drinks',{ascending:false});
+  if(error) throw error;
+  const total=data.reduce((a,r)=>a+r.drinks,0);
+  if(!total) return; // keep demo bar
+  const pct=r=>Math.round(r.drinks/total*100);
+  document.getElementById('possession').innerHTML = data.map(r=>{
+    const m=DRINK_META[r.drink_type]||DRINK_META.other, p=pct(r);
+    return `<div style="width:${r.drinks/total*100}%;background:${m.color}">${p>=12?m.label.toUpperCase()+' ':''}${p>=6?p+'%':''}</div>`;
+  }).join('');
+  document.getElementById('possession-legend').innerHTML = data.map(r=>{
+    const m=DRINK_META[r.drink_type]||DRINK_META.other;
+    return `<span><i style="background:${m.color}"></i>${m.label} ${pct(r)}%</span>`;
+  }).join('');
+}
+
+// ---- guestbook ----
+async function loadGuestbook(){
+  const { data, error } = await sb.from('guestbook_feed').select('*').order('created_at',{ascending:false}).limit(50);
+  if(error) throw error;
+  document.getElementById('gb-list').innerHTML = data.length
+    ? data.map(g=>`<div class="gb-item"><div class="gb-meta"><strong>@${esc(g.username)}</strong> ${timeAgo(g.created_at)}`+
+        (me&&g.user_id===me.id?`<button class="gb-del" title="Delete" onclick="deleteMessage(${g.id})">✕</button>`:'')+
+        `</div><div class="gb-msg">${esc(g.message)}</div></div>`).join('')
+    : '<div class="gb-empty">No messages yet. Be the first to say na zdrave 🥃</div>';
+}
+async function deleteMessage(id){
+  const { error } = await sb.from('guestbook').delete().eq('id', id);
+  if(!error) loadGuestbook();
+}
+
+async function loadAll(){
+  try { await Promise.all([loadLeague(), loadPossession(), loadGuestbook()]); }
+  catch(err){ console.warn('Supabase load failed, keeping demo data:', err.message||err); }
+}
+
+// ---- writes ----
+function bindForm(formId, msgId, handler){
+  document.getElementById(formId).addEventListener('submit', async e=>{
+    e.preventDefault();
+    const btn=e.target.querySelector('button[type=submit]'); btn.disabled=true; setMsg(msgId,'');
+    try { const ok=await handler(e.target); setMsg(msgId, ok, true); loadAll(); }
+    catch(err){ setMsg(msgId, '✗ '+(err.message||'Something went wrong')); }
+    finally { btn.disabled=false; }
+  });
+}
+const must = ({ error }) => { if(error) throw error; };
+
+bindForm('drink-form','drink-msg', async f=>{
+  const quantity=+f.quantity.value;
+  must(await sb.from('drink_logs').insert({ drink_type:f.drink_type.value, quantity,
+    team_building_id: f.team_building_id.value ? +f.team_building_id.value : null }));
+  playSound('splash');
+  return `✓ ${quantity} × ${f.drink_type.options[f.drink_type.selectedIndex].text} logged. Na zdrave!`;
+});
+bindForm('ticket-form','ticket-msg', async f=>{
+  must(await sb.from('ticket_logs').insert({ tickets:+f.tickets.value }));
+  return `✓ ${f.tickets.value} ticket(s) logged. Suspiciously productive.`;
+});
+bindForm('tb-form','tb-msg', async f=>{
+  must(await sb.from('team_buildings').insert({ name:f.name.value.trim(), emoji:f.emoji.value.trim()||'🍻', days:+f.days.value }));
+  const name=f.name.value.trim(); f.reset();
+  return `✓ "${name}" added to the league`;
+});
+bindForm('gb-form','gb-msg', async f=>{
+  must(await sb.from('guestbook').insert({ message:f.message.value.trim() }));
+  f.reset();
+  return '✓ Posted';
+});
+
+if(sb){
+  document.getElementById('signin-btn').classList.remove('hidden');
+  document.getElementById('guestbook-label').classList.remove('hidden');
+  document.getElementById('guestbook').classList.remove('hidden');
+  document.getElementById('gb-signin').classList.remove('hidden');
+  // Supabase recommends not awaiting other Supabase calls inside this callback
+  sb.auth.onAuthStateChange((_event, session)=>{ setTimeout(()=>onSession(session), 0); });
+}
 </script>
 </body>
 </html>

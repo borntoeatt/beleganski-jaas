@@ -41,6 +41,7 @@ Click the rakia glass. You know what to do.
 | Layer | Technology |
 |-------|-----------|
 | Frontend | Pure HTML/CSS/JS (no framework needed for legends) |
+| Database / Auth | Supabase (hosted Postgres + Auth, RLS) |
 | Container | nginx:alpine |
 | Registry | Docker Hub (`dporkov/beleganski-jaas`) |
 | Orchestration | k3s |
@@ -88,6 +89,33 @@ kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 kubectl apply -f k8s/ingress.yaml
 ```
+
+## Supabase setup (accounts, league, guestbook)
+
+The site stays a static nginx container. The browser talks to hosted Supabase directly using the
+**publishable (anon) key**. That key is public by design: access is enforced by the Row Level
+Security policies in `supabase/migrations/`. With an empty `config.js`, the site runs in demo mode
+(no sign-in, hardcoded stats).
+
+| File | What it does |
+|------|-------------|
+| `supabase/migrations/*.sql` | Schema: profiles, team buildings, drink logs, ticket logs, guestbook, RLS policies, stats views |
+| `.github/workflows/supabase-migrations.yml` | Runs `supabase db push` on pushes to `main` that change migrations (or manually) |
+| `config.js` | Public Supabase URL + publishable key used by the browser |
+
+One-time setup:
+
+1. **Create a project** at supabase.com and note the project ref, the DB password, the project URL and the publishable key (Project Settings → API).
+2. **Add repo secrets** (GitHub → Settings → Secrets and variables → Actions):
+   - `SUPABASE_ACCESS_TOKEN`: a personal access token from supabase.com → Account → Access Tokens
+   - `SUPABASE_DB_PASSWORD`: the database password
+   - `SUPABASE_PROJECT_REF`: the project ref (the `<ref>` in `https://<ref>.supabase.co`)
+3. **Run the migrations**: Actions → *Supabase migrations* → Run workflow (or merge a migration change to `main`).
+4. **Auth settings** (Authentication → URL Configuration): Site URL `https://alex-jaas.dporkov.tech`, and add `http://localhost:8080` to the redirect URLs for local dev. Email + password sign-up with email confirmation is the default.
+5. **Fill in `config.js`** with the project URL and publishable key and commit it. Never put the `service_role` / secret key there.
+
+Supabase's built-in email sender is heavily rate-limited and meant for testing. Configure custom SMTP
+(Authentication → Emails → SMTP) before opening registration to real users.
 
 ## Known Issues
 

@@ -6,6 +6,7 @@ on:
       - main
     paths-ignore:
       - 'k8s/deployment.yaml'
+      - 'supabase/**'
 
 jobs:
   build-and-push:

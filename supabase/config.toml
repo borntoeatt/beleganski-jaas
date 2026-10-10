@@ -1,0 +1,4 @@
+# Supabase CLI project config. Only used by the CLI (supabase link / db push in CI).
+# Auth settings for the hosted project (site URL, redirect URLs, email) are set in the
+# Supabase dashboard; see README "Supabase setup".
+project_id = "beleganski-jaas"
