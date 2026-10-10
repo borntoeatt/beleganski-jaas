@@ -3,6 +3,13 @@ import { SUPABASE_URL, SUPABASE_KEY } from '../config';
 import { playSound } from './audio.js';
 
 // ====== SUPABASE: accounts, league, guestbook ======
+// Email links that fail (expired, already used) redirect back with #error=...&error_code=...
+// Read it before the Supabase client starts processing the URL.
+const authLinkError = (() => {
+  const p = new URLSearchParams(location.hash.slice(1));
+  return p.get('error') ? { code: p.get('error_code') || p.get('error'), description: p.get('error_description') || '' } : null;
+})();
+
 // Static demo mode when src/config.ts has no Supabase settings.
 const sb = (SUPABASE_URL && SUPABASE_KEY) ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 let me = null; // { id, username }
@@ -281,4 +288,16 @@ if(sb){
       if(event==='PASSWORD_RECOVERY') openAuth('reset');
     }, 0);
   });
+  if(authLinkError) showAuthLinkError(authLinkError);
+}
+
+// Explain a failed email link and offer the way out, instead of leaving the error in the address bar
+function showAuthLinkError({ code, description }){
+  history.replaceState(null, '', location.pathname + location.search);
+  openAuth('signin');
+  setMsg('auth-msg', code==='otp_expired'
+    ? '✗ This email link has expired or was already used. If you already confirmed your email, just sign in. '
+      + 'Otherwise resend the confirmation email below, or use "Forgot password?" for a new reset link.'
+    : `✗ The email link didn't work (${description || code}). Sign in, or request a new link below.`);
+  offerResend();
 }

@@ -137,7 +137,17 @@ One-time setup:
    - `SUPABASE_DB_PASSWORD`: the database password
    - `SUPABASE_PROJECT_REF`: the project ref (the `<ref>` in `https://<ref>.supabase.co`)
 3. **Run the migrations**: Actions → *Supabase migrations* → Run workflow (or merge a migration change to `main`).
-4. **Auth settings** (Authentication → URL Configuration): Site URL `https://alex-jaas.dporkov.tech`, and add `http://localhost:8080` to the redirect URLs for local dev. Email + password sign-up with email confirmation is the default.
+4. **Auth settings** (Authentication → URL Configuration):
+   - Site URL: `https://alex-jaas.dporkov.tech`
+   - Redirect URLs: `https://alex-jaas.dporkov.tech/**` (production only, on purpose)
+
+   Email + password sign-up with email confirmation is the default. Email links (confirmation,
+   password reset) always land on the production site, even when triggered from local dev:
+   confirm or reset there, then sign in locally with the same account.
+
+   Links are single-use. Some mail providers open links to scan them, which uses them up; the
+   site then shows "link expired or already used" with a resend button. Often the account is
+   already confirmed and signing in just works.
 5. **Fill in `src/config.ts`** with the project URL and publishable key and commit it. Never put the `service_role` / secret key there.
 
 Supabase's built-in email sender is heavily rate-limited and meant for testing. Configure custom SMTP
