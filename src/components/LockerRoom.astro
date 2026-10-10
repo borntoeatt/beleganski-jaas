@@ -1,0 +1,45 @@
+<!-- Locker room: logging for signed-in players -->
+<div class="locker-card hidden" id="locker">
+  <div class="locker-head">🎽 Locker room — log your stats <span id="locker-me"></span></div>
+  <div class="locker-body">
+    <div>
+      <form class="jaas-form" id="drink-form">
+        <div class="form-title">🥃 Log drinks</div>
+        <div class="form-row">
+          <label>Drink
+            <select name="drink_type">
+              <option value="rakia">🥃 Rakia</option><option value="beer">🍺 Beer</option>
+              <option value="wine">🍷 Wine</option><option value="mastika">🌿 Mastika</option>
+              <option value="whisky">🥃 Whisky</option><option value="water">💧 Water</option>
+              <option value="other">🍹 Other</option>
+            </select>
+          </label>
+          <label>Quantity <input name="quantity" type="number" min="1" max="20" value="1" required></label>
+        </div>
+        <label>Team building (optional)
+          <select name="team_building_id" id="tb-select"><option value="">— regular work day —</option></select>
+        </label>
+        <button class="btn-primary" type="submit">Log drinks</button>
+        <div class="form-msg" id="drink-msg"></div>
+      </form>
+      <details class="new-tb">
+        <summary>＋ Add a team building</summary>
+        <form class="jaas-form" id="tb-form">
+          <div class="form-row">
+            <label style="flex:0 0 70px">Emoji <input name="emoji" maxlength="8" value="🍻"></label>
+            <label>Name <input name="name" minlength="2" maxlength="60" required placeholder="Bansko ski trip"></label>
+            <label style="flex:0 0 70px">Days <input name="days" type="number" min="1" max="14" value="1" required></label>
+          </div>
+          <button class="btn-ghost" type="submit">Add team building</button>
+          <div class="form-msg" id="tb-msg"></div>
+        </form>
+      </details>
+    </div>
+    <form class="jaas-form" id="ticket-form">
+      <div class="form-title">🎫 Log tickets processed</div>
+      <label>Tickets <input name="tickets" type="number" min="1" max="100" value="1" required></label>
+      <button class="btn-primary" type="submit">Log tickets</button>
+      <div class="form-msg" id="ticket-msg"></div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<!-- ====== FLOOD ====== -->
+<div id="flood"></div>
+
+<!-- ====== SCENE 2 ====== -->
+<div id="scene2">
+  <div class="water-overlay"></div>
+  <div id="bubbles-container"></div>
+  <div id="steam-container"></div>
+
+  <div id="achievement">
+    <span class="ach-label">🏆 DEPLOYMENT SUCCESSFUL</span>
+    🥃 alexander-beleganski@jacuzzi deployed to production 🥃
+  </div>
+
+  <div class="deploy-success-bar">
+    ✓ &nbsp;<span style="color:#e3b341">npm run deploy:alex</span>&nbsp; completed in 0.3s &nbsp;•&nbsp; env: <strong>jacuzzi</strong> &nbsp;•&nbsp; rakia: <strong>∞</strong>
+  </div>
+
+  <div class="jacuzzi-center">
+    <div class="alex-photo-wrap">
+      <img id="alex-jacuzzi-img" src="alex-jacuzzi.jpg" alt="Alex in jacuzzi"
+           onerror="this.style.display='none';document.getElementById('jacuzzi-fallback').style.display='flex'">
+      <div id="jacuzzi-fallback" style="display:none;flex-direction:column;align-items:center;justify-content:center;">
+        <span style="font-size:48px">🛁</span><br><span style="font-size:13px">add alex-jacuzzi.jpg</span>
+      </div>
+      <div class="stamp">IN<br>PRODUCTION<br>🛁</div>
+    </div>
+  </div>
+
+  <div id="big-title">NA ZDRAVJE, ALEX! 🥃</div>
+  <div id="counter-text"></div>
+
+  <button id="hr-btn" data-action="reportToHR">📋 Report Alex to HR</button>
+  <button id="back-btn" data-action="resetToScene1">← git checkout main</button>
+</div>

@@ -1,0 +1,33 @@
+---
+import '../styles/global.css';
+
+interface Props { title: string; description: string; }
+const { title, description } = Astro.props;
+const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const ogImage = `${site}/alex-jacuzzi.jpg`;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{title}</title>
+
+<!-- OG / Social sharing -->
+<meta property="og:title" content="alexander-beleganski — open source human">
+<meta property="og:description" content={description}>
+<meta property="og:image" content={ogImage}>
+<meta property="og:url" content={site}>
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="alexander-beleganski — open source human">
+<meta name="twitter:description" content="JaaS — Jacuzzi as a Service 🥃">
+<meta name="twitter:image" content={ogImage}>
+
+<!-- GoatCounter analytics -->
+<script is:inline data-goatcounter="https://dporkov.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+<slot />
+</body>
+</html>

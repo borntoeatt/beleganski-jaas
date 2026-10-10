@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import Overlays from '../components/Overlays.astro';
+import Header from '../components/Header.astro';
+import ProfileRow from '../components/ProfileRow.astro';
+import ContribGraph from '../components/ContribGraph.astro';
+import Terminal from '../components/Terminal.astro';
+import PinnedRepos from '../components/PinnedRepos.astro';
+import LockerRoom from '../components/LockerRoom.astro';
+import League from '../components/League.astro';
+import MatchStats from '../components/MatchStats.astro';
+import Guestbook from '../components/Guestbook.astro';
+import StatusPage from '../components/StatusPage.astro';
+import Ticker from '../components/Ticker.astro';
+import Scene2 from '../components/Scene2.astro';
+import EasterEgg from '../components/EasterEgg.astro';
+import HrModal from '../components/HrModal.astro';
+import AuthModal from '../components/AuthModal.astro';
+---
+<Base
+  title="alexander-beleganski | open source human"
+  description="open source human used for drinking rakia in jacuzzi during work hours. JaaS — Jacuzzi as a Service."
+>
+  <Overlays />
+
+  <!-- ====== SCENE 1: the GitHub-style profile ====== -->
+  <div id="scene1">
+    <Header />
+    <ProfileRow />
+    <ContribGraph />
+    <Terminal />
+    <PinnedRepos />
+    <LockerRoom />
+    <League />
+    <MatchStats />
+    <Guestbook />
+    <StatusPage />
+  </div>
+
+  <Ticker />
+
+  <!-- ====== SCENE 2: deployed to the jacuzzi ====== -->
+  <Scene2 />
+
+  <EasterEgg />
+  <HrModal />
+  <AuthModal />
+  <canvas id="confetti"></canvas>
+
+  <script>
+    import '../scripts/main.js';
+  </script>
+</Base>
