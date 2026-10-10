@@ -4,6 +4,6 @@
 // / secret key here.
 // Leave empty to run the site in static demo mode (no sign-in, hardcoded stats).
 window.JAAS_CONFIG = {
-  supabaseUrl: '',  // e.g. https://<project-ref>.supabase.co
-  supabaseKey: '',  // publishable key (sb_publishable_...) or legacy anon key
+  supabaseUrl: 'https://zckxkooskmpvxjujobjz.supabase.co',
+  supabaseKey: 'sb_publishable_8CXt7stb_5PzR_R2xYqSQQ_WVQlCDs7',
 };

@@ -1533,7 +1533,8 @@ document.getElementById('auth-form').addEventListener('submit', async e=>{
   try {
     if(authMode==='register'){
       const username=f.username.value.trim().toLowerCase();
-      const { data: taken } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+      const { data: taken, error: checkErr } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+      if(checkErr) throw new Error('Registration is not available right now. Try again later.');
       if(taken) throw new Error('Username already taken');
       const { data, error } = await sb.auth.signUp({ email, password,
         options:{ data:{ username }, emailRedirectTo: location.origin + location.pathname } });
