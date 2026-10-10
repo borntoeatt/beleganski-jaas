@@ -16,6 +16,10 @@
 <meta name="twitter:description" content="JaaS — Jacuzzi as a Service 🥃">
 <meta name="twitter:image" content="https://alex-jaas.dporkov.tech/alex-jacuzzi.jpg">
 
+<!-- Supabase (accounts, league, guestbook). Empty config.js = static demo mode -->
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+
 <!-- GoatCounter analytics -->
 <script data-goatcounter="https://dporkov.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
@@ -65,6 +69,7 @@ body::before {
   transition: opacity 0.5s;
   gap: 10px;
 }
+#scene1 > * { flex-shrink: 0; } /* keep cards full height; scene1 scrolls instead */
 
 .gh-header {
   width: 100%;
@@ -451,8 +456,217 @@ body::before {
 .cursor-trail { position: fixed; font-size: 12px; pointer-events: none; z-index: 9998; animation: trailFade 0.5s forwards; line-height: 1; }
 @keyframes trailFade { 0%{opacity:1;transform:scale(1) translateY(0)} 100%{opacity:0;transform:scale(0.3) translateY(-16px)} }
 
+/* ====== CONTRIBUTION GRAPH ====== */
+.contrib-card {
+  width: 100%; max-width: 880px;
+  background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 14px;
+}
+.contrib-head {
+  display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px;
+  font-size: clamp(11px, 1.5vw, 14px); color: #e6edf3; margin-bottom: 10px;
+}
+.contrib-head strong { color: #ffd700; }
+.contrib-sub { font-size: 11px; color: #8b949e; font-family: monospace; }
+.contrib-scroll { overflow-x: auto; padding-bottom: 4px; }
+.contrib-months, .contrib-grid { display: grid; grid-auto-flow: column; grid-auto-columns: 13px; gap: 3px; width: max-content; margin: 0 auto; }
+.contrib-months { font-size: 9px; color: #8b949e; height: 13px; margin-bottom: 2px; }
+.contrib-months span { white-space: nowrap; }
+.contrib-grid { grid-template-rows: repeat(7, 13px); }
+.contrib-cell { width: 13px; height: 13px; border-radius: 2px; outline: 1px solid rgba(255,255,255,0.04); outline-offset: -1px; }
+.contrib-cell:hover { outline: 1px solid #e6edf3; }
+.lvl0 { background: #21262d; } .lvl1 { background: #4a3206; } .lvl2 { background: #7a5207; }
+.lvl3 { background: #c8850a; } .lvl4 { background: #ffd700; }
+.contrib-legend {
+  display: flex; align-items: center; justify-content: flex-end; gap: 3px;
+  font-size: 10px; color: #8b949e; margin-top: 6px;
+}
+.contrib-legend .contrib-cell { display: inline-block; width: 11px; height: 11px; }
+
+/* ====== PINNED REPOS ====== */
+.section-label { width: 100%; max-width: 880px; font-size: 13px; color: #e6edf3; margin-top: 6px; }
+.section-label span { color: #8b949e; font-size: 11px; font-family: monospace; }
+.pinned-grid { width: 100%; max-width: 880px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.repo-card {
+  background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px; transition: border-color 0.2s, transform 0.2s;
+}
+.repo-card:hover { border-color: #c8850a; transform: translateY(-2px); }
+.repo-top { display: flex; align-items: center; gap: 8px; }
+.repo-name { color: #58a6ff; font-weight: bold; font-size: 13px; font-family: monospace; }
+.repo-vis { margin-left: auto; font-size: 10px; color: #8b949e; border: 1px solid #30363d; border-radius: 20px; padding: 0 7px; }
+.repo-desc { font-size: 11px; color: #8b949e; line-height: 1.5; flex: 1; }
+.repo-meta { display: flex; gap: 14px; font-size: 11px; color: #8b949e; align-items: center; }
+.lang-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+
+/* ====== STATUS PAGE ====== */
+.status-card { width: 100%; max-width: 880px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+.status-banner {
+  background: linear-gradient(135deg, #1f6f1f, #238636); color: #fff; padding: 10px 14px;
+  font-size: clamp(12px, 1.6vw, 15px); font-weight: bold; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+}
+.status-banner span { font-weight: normal; font-size: 11px; opacity: 0.85; font-family: monospace; }
+.status-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+.uptime-row-head { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+.uptime-row-head .pct { font-family: monospace; font-size: 11px; }
+.uptime-bars { display: flex; gap: 2px; height: 24px; }
+.uptime-bars i { flex: 1; min-width: 1px; border-radius: 2px; background: #3fb950; }
+.uptime-bars i.warn { background: #e3b341; }
+.uptime-bars i.down { background: #da3633; }
+.uptime-bars i:hover { opacity: 0.6; }
+.uptime-foot { display: flex; justify-content: space-between; font-size: 9px; color: #6e7681; margin-top: 3px; font-family: monospace; }
+.incidents-title { font-size: 12px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #30363d; padding-top: 12px; }
+.incident { border-left: 3px solid #30363d; padding: 2px 0 2px 10px; }
+.incident.major { border-color: #da3633; } .incident.minor { border-color: #e3b341; } .incident.maint { border-color: #58a6ff; }
+.incident-title { font-size: 12px; font-weight: bold; color: #e6edf3; }
+.incident-text { font-size: 11px; color: #8b949e; line-height: 1.5; margin-top: 2px; }
+.incident-text b { color: #c9d1d9; }
+.incident-date { font-size: 10px; color: #6e7681; font-family: monospace; margin-top: 2px; }
+
+/* ====== FOOTBALL STATS ====== */
+.pitch-card {
+  width: 100%; max-width: 880px; border: 1px solid #30363d; border-radius: 8px; overflow: hidden;
+  background: repeating-linear-gradient(90deg, #0f2a14 0 60px, #12321a 60px 120px);
+}
+.pitch-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: #0b1a0e; border-bottom: 2px solid #3fb950; padding: 8px 14px;
+  font-family: Impact, 'Arial Black', sans-serif; letter-spacing: 1px; color: #fff; font-size: clamp(13px, 1.8vw, 16px);
+}
+.pitch-head .live { font-family: monospace; font-size: 10px; background: #da3633; color: #fff; padding: 2px 7px; border-radius: 3px; letter-spacing: 1px; animation: cursorBlink 1.6s step-end infinite; }
+.league-scroll { overflow-x: auto; }
+.league-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 520px; }
+.league-table th {
+  text-align: center; font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px;
+  padding: 7px 6px; background: rgba(0,0,0,0.35);
+}
+.league-table td { text-align: center; padding: 7px 6px; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.25); font-family: monospace; }
+.league-table th:nth-child(2), .league-table td:nth-child(2) { text-align: left; font-family: inherit; }
+.league-table tr:first-child td { background: rgba(255,215,0,0.08); }
+.league-table .pos { color: #8b949e; width: 28px; }
+.league-table tr:nth-child(-n+2) .pos { color: #3fb950; font-weight: bold; }
+.league-table tr:last-child .pos { color: #ff7b72; font-weight: bold; }
+.league-table .pts { color: #ffd700; font-weight: bold; font-size: 13px; }
+.form { display: inline-flex; gap: 3px; }
+.form b { width: 16px; height: 16px; border-radius: 50%; font-size: 9px; line-height: 16px; color: #fff; display: inline-block; }
+.form .w { background: #238636; } .form .d { background: #6e7681; } .form .l { background: #da3633; }
+.golden-boot {
+  padding: 8px 14px; font-size: 11px; color: #e3b341; font-family: monospace; background: rgba(0,0,0,0.4);
+  border-top: 1px solid rgba(255,215,0,0.25);
+}
+
+.match-grid { display: grid; grid-template-columns: 240px 1fr; gap: 14px; padding: 14px; }
+.player-card {
+  background: linear-gradient(160deg, #f7e08b 0%, #d4a937 45%, #a67c1a 100%);
+  border-radius: 14px 14px 40px 40px; padding: 12px 12px 16px; color: #3b2a05;
+  box-shadow: 0 0 24px rgba(255,215,0,0.25); position: relative; text-align: center;
+}
+.player-rating { position: absolute; top: 10px; left: 14px; text-align: center; line-height: 1; font-family: Impact, sans-serif; }
+.player-rating .ovr { font-size: 34px; display: block; }
+.player-rating .posn { font-size: 13px; letter-spacing: 1px; }
+.player-card img { width: 110px; height: 110px; object-fit: cover; object-position: center 15%; border-radius: 50%; border: 3px solid rgba(59,42,5,0.4); margin: 4px 0 6px 30px; }
+.player-name { font-family: Impact, sans-serif; font-size: 18px; letter-spacing: 1px; border-bottom: 1px solid rgba(59,42,5,0.35); padding-bottom: 6px; margin-bottom: 8px; }
+.player-attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; font-family: Impact, sans-serif; font-size: 15px; text-align: left; white-space: nowrap; }
+.player-attrs span b { display: inline-block; width: 28px; }
+.player-attrs small { font-family: monospace; font-size: 10px; opacity: 0.75; }
+
+.stats-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel-title { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; }
+.possession { display: flex; height: 26px; border-radius: 4px; overflow: hidden; font-size: 10px; font-weight: bold; font-family: monospace; }
+.possession div { display: flex; align-items: center; justify-content: center; color: #111; white-space: nowrap; overflow: hidden; }
+.possession-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 10px; color: #c9d1d9; justify-content: center; }
+.possession-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.teams-row { display: flex; justify-content: space-between; font-family: Impact, sans-serif; font-size: 13px; letter-spacing: 1px; }
+.teams-row .home { color: #ffd700; } .teams-row .away { color: #58a6ff; }
+.cmp-row { display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; gap: 8px; }
+.cmp-val { font-family: monospace; font-size: 13px; font-weight: bold; }
+.cmp-val.home { color: #ffd700; text-align: left; } .cmp-val.away { color: #58a6ff; text-align: right; }
+.cmp-mid { display: flex; flex-direction: column; gap: 3px; }
+.cmp-label { text-align: center; font-size: 11px; color: #c9d1d9; }
+.cmp-bars { display: flex; gap: 3px; height: 7px; }
+.cmp-bars .h, .cmp-bars .a { flex: 1; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; display: flex; }
+.cmp-bars .h { justify-content: flex-end; }
+.cmp-bars .h i { background: #ffd700; border-radius: 4px; }
+.cmp-bars .a i { background: #58a6ff; border-radius: 4px; }
+
+/* ====== ACCOUNTS (Supabase) ====== */
+.auth-btn { background: #238636; border-color: #2ea043; color: #fff; }
+.auth-btn:hover { background: #2ea043; }
+.user-chip { font-family: monospace; font-size: 12px; color: #e3b341; }
+.hidden { display: none !important; }
+
+#auth-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 8500;
+  display: none; align-items: center; justify-content: center; padding: 16px;
+}
+#auth-modal.show { display: flex; }
+.auth-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; width: 100%; max-width: 360px; overflow: hidden; }
+.auth-tabs { display: flex; border-bottom: 1px solid #30363d; }
+.auth-tabs button {
+  flex: 1; background: none; border: none; color: #8b949e; padding: 12px; font-size: 13px; font-family: inherit;
+  cursor: pointer; border-bottom: 2px solid transparent;
+}
+.auth-tabs button.active { color: #e6edf3; border-bottom-color: #f78166; }
+.auth-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.auth-title { font-size: 14px; font-weight: bold; color: #e6edf3; }
+.auth-title small { display: block; font-weight: normal; font-size: 11px; color: #8b949e; margin-top: 4px; line-height: 1.5; }
+.auth-links { font-size: 11px; color: #8b949e; text-align: center; line-height: 1.8; }
+.auth-links a { color: #58a6ff; text-decoration: none; cursor: pointer; }
+.auth-links a:hover { text-decoration: underline; }
+
+.jaas-form label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #8b949e; }
+.jaas-form input, .jaas-form select, .jaas-form textarea {
+  background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3;
+  padding: 7px 9px; font-size: 13px; font-family: inherit; cursor: text; width: 100%;
+}
+.jaas-form select { cursor: pointer; }
+.jaas-form input:focus, .jaas-form select:focus, .jaas-form textarea:focus { outline: none; border-color: #58a6ff; box-shadow: 0 0 0 2px rgba(88,166,255,0.2); }
+.jaas-form textarea { resize: vertical; min-height: 56px; }
+.btn-primary {
+  background: #238636; color: #fff; border: 1px solid #2ea043; border-radius: 6px;
+  padding: 8px 14px; font-size: 13px; font-weight: bold; font-family: inherit; cursor: pointer;
+}
+.btn-primary:hover { background: #2ea043; }
+.btn-primary:disabled { opacity: 0.5; cursor: wait; }
+.btn-ghost { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 7px 12px; font-size: 12px; font-family: inherit; cursor: pointer; }
+.btn-ghost:hover { background: #30363d; }
+.form-msg { font-size: 12px; font-family: monospace; line-height: 1.5; min-height: 0; }
+.form-msg.err { color: #ff7b72; } .form-msg.ok { color: #3fb950; }
+
+.locker-card { width: 100%; max-width: 880px; background: #161b22; border: 1px solid #c8850a; border-radius: 8px; overflow: hidden; }
+.locker-head { background: rgba(200,133,10,0.15); padding: 9px 14px; font-size: 13px; color: #e3b341; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.locker-head span { font-family: monospace; font-size: 11px; color: #c9d1d9; }
+.locker-body { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; padding: 14px; }
+.locker-body form { display: flex; flex-direction: column; gap: 8px; }
+.form-row { display: flex; gap: 8px; }
+.form-row > * { flex: 1; min-width: 0; }
+.form-title { font-size: 12px; color: #e6edf3; font-weight: bold; }
+details.new-tb summary { font-size: 11px; color: #58a6ff; cursor: pointer; }
+details.new-tb form { margin-top: 8px; }
+
+.scorers-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.scorers-table th { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; padding: 6px; text-align: center; background: rgba(0,0,0,0.35); }
+.scorers-table td { padding: 6px; text-align: center; font-family: monospace; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.25); }
+.scorers-table td:nth-child(2), .scorers-table th:nth-child(2) { text-align: left; }
+.scorers-table tr.me td { background: rgba(88,166,255,0.12); }
+
+.guestbook-card { width: 100%; max-width: 880px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.guestbook-list { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+.gb-item { border: 1px solid #30363d; border-radius: 8px; padding: 8px 12px; background: #0d1117; }
+.gb-meta { display: flex; gap: 8px; align-items: center; font-size: 11px; color: #8b949e; font-family: monospace; }
+.gb-meta strong { color: #58a6ff; }
+.gb-del { margin-left: auto; background: none; border: none; color: #8b949e; cursor: pointer; font-size: 12px; }
+.gb-del:hover { color: #ff7b72; }
+.gb-msg { font-size: 13px; color: #e6edf3; margin-top: 4px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.gb-empty { font-size: 12px; color: #8b949e; font-family: monospace; text-align: center; padding: 12px; }
+.data-badge { font-size: 9px; font-family: monospace; padding: 1px 6px; border-radius: 3px; background: #21262d; color: #8b949e; border: 1px solid #30363d; letter-spacing: 1px; }
+.data-badge.live { background: #0f3d1f; color: #3fb950; border-color: #238636; }
+
 /* ====== MOBILE ====== */
 @media (max-width: 600px) {
+  .locker-body { grid-template-columns: 1fr; }
+  .match-grid { grid-template-columns: 1fr; }
+  .player-card { width: 100%; max-width: 250px; margin: 0 auto; }
+  .pinned-grid { grid-template-columns: 1fr; }
   .profile-row { flex-direction: column; }
   .profile-card { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; }
   .profile-avatar { width: 70px; height: 70px; }
@@ -486,6 +700,9 @@ body::before {
     </span>
     <span class="gh-badge" id="live-status">🟢 Available (in jacuzzi)</span>
     <button class="fork-btn" onclick="showForkError()">🍴 Fork</button>
+    <button class="fork-btn auth-btn hidden" id="signin-btn" onclick="openAuth('signin')">Sign in</button>
+    <span class="user-chip hidden" id="user-chip"></span>
+    <button class="fork-btn hidden" id="signout-btn" onclick="signOut()">Sign out</button>
   </div>
 
   <div class="profile-row">
@@ -536,6 +753,21 @@ body::before {
     </div>
   </div>
 
+  <!-- Contribution graph -->
+  <div class="contrib-card">
+    <div class="contrib-head">
+      <div><strong id="contrib-total">...</strong> rakia contributions in the last year</div>
+      <div class="contrib-sub">code contributions: 0</div>
+    </div>
+    <div class="contrib-scroll">
+      <div class="contrib-months" id="contrib-months"></div>
+      <div class="contrib-grid" id="contrib-grid"></div>
+    </div>
+    <div class="contrib-legend">
+      Sober <span class="contrib-cell lvl0"></span><span class="contrib-cell lvl1"></span><span class="contrib-cell lvl2"></span><span class="contrib-cell lvl3"></span><span class="contrib-cell lvl4"></span> Na zdrave
+    </div>
+  </div>
+
   <!-- Terminal -->
   <div class="terminal-card">
     <div class="terminal-header">
@@ -555,6 +787,179 @@ body::before {
   </div>
 
   <button id="deploy-btn" onclick="triggerReveal()">🚀 DEPLOY ALEX TO JACUZZI 🚀</button>
+
+  <!-- Pinned repos -->
+  <div class="section-label">📌 Pinned <span>— 4 repos, 0 commits</span></div>
+  <div class="pinned-grid">
+    <div class="repo-card">
+      <div class="repo-top"><span>📦</span><span class="repo-name">rakia-pipeline</span><span class="repo-vis">Public</span></div>
+      <div class="repo-desc">CI/CD for home distilling. Build fails if ABV &lt; 40%. Deploys straight to the jacuzzi.</div>
+      <div class="repo-meta"><span><i class="lang-dot" style="background:#89e051"></i>Shell</span><span>⭐ 420</span><span>🍴 0</span></div>
+    </div>
+    <div class="repo-card">
+      <div class="repo-top"><span>📦</span><span class="repo-name">jacuzzi-operator</span><span class="repo-vis">Public</span></div>
+      <div class="repo-desc">Kubernetes operator that keeps the water at 38°C. Reconciles every 5 min. Never scales down.</div>
+      <div class="repo-meta"><span><i class="lang-dot" style="background:#00add8"></i>Go</span><span>⭐ 138</span><span>🍴 0</span></div>
+    </div>
+    <div class="repo-card">
+      <div class="repo-top"><span>📦</span><span class="repo-name">standup-skipper</span><span class="repo-vis">Public</span></div>
+      <div class="repo-desc">Auto-replies "in jacuzzi, wont fix" to every standup invite. 100% test coverage (tested in jacuzzi).</div>
+      <div class="repo-meta"><span><i class="lang-dot" style="background:#3572a5"></i>Python</span><span>⭐ 97</span><span>🍴 0</span></div>
+    </div>
+    <div class="repo-card">
+      <div class="repo-top"><span>📦</span><span class="repo-name">terraform-provider-shopska</span><span class="repo-vis">Public</span></div>
+      <div class="repo-desc">Declarative shopska salad. Manages tomatoes, cucumbers and sirene as code. Requires rakia &gt;= 1.0.</div>
+      <div class="repo-meta"><span><i class="lang-dot" style="background:#844fba"></i>HCL</span><span>⭐ 64</span><span>🍴 0</span></div>
+    </div>
+  </div>
+
+  <!-- Locker room: logging for signed-in players -->
+  <div class="locker-card hidden" id="locker">
+    <div class="locker-head">🎽 Locker room — log your stats <span id="locker-me"></span></div>
+    <div class="locker-body">
+      <div>
+        <form class="jaas-form" id="drink-form">
+          <div class="form-title">🥃 Log drinks</div>
+          <div class="form-row">
+            <label>Drink
+              <select name="drink_type">
+                <option value="rakia">🥃 Rakia</option><option value="beer">🍺 Beer</option>
+                <option value="wine">🍷 Wine</option><option value="mastika">🌿 Mastika</option>
+                <option value="whisky">🥃 Whisky</option><option value="water">💧 Water</option>
+                <option value="other">🍹 Other</option>
+              </select>
+            </label>
+            <label>Quantity <input name="quantity" type="number" min="1" max="20" value="1" required></label>
+          </div>
+          <label>Team building (optional)
+            <select name="team_building_id" id="tb-select"><option value="">— regular work day —</option></select>
+          </label>
+          <button class="btn-primary" type="submit">Log drinks</button>
+          <div class="form-msg" id="drink-msg"></div>
+        </form>
+        <details class="new-tb">
+          <summary>＋ Add a team building</summary>
+          <form class="jaas-form" id="tb-form">
+            <div class="form-row">
+              <label style="flex:0 0 70px">Emoji <input name="emoji" maxlength="8" value="🍻"></label>
+              <label>Name <input name="name" minlength="2" maxlength="60" required placeholder="Bansko ski trip"></label>
+              <label style="flex:0 0 70px">Days <input name="days" type="number" min="1" max="14" value="1" required></label>
+            </div>
+            <button class="btn-ghost" type="submit">Add team building</button>
+            <div class="form-msg" id="tb-msg"></div>
+          </form>
+        </details>
+      </div>
+      <form class="jaas-form" id="ticket-form">
+        <div class="form-title">🎫 Log tickets processed</div>
+        <label>Tickets <input name="tickets" type="number" min="1" max="100" value="1" required></label>
+        <button class="btn-primary" type="submit">Log tickets</button>
+        <div class="form-msg" id="ticket-msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Team building league -->
+  <div class="section-label">⚽ Team Building League <span>— season 2025/26, drinks per event</span></div>
+  <div class="pitch-card">
+    <div class="pitch-head">🏆 RAKIA PREMIER LEAGUE <span class="data-badge" id="league-badge">DEMO DATA</span></div>
+    <div class="league-scroll">
+      <table class="league-table" id="league-table">
+        <tr><th>#</th><th>Team building</th><th>Days</th><th>🥃 Drinks</th><th>Per day</th><th>Form</th><th>Pts</th></tr>
+        <tr><td class="pos">1</td><td>⛷️ Bansko ski trip</td><td>3</td><td>64</td><td>21.3</td><td><span class="form"><b class="w">W</b><b class="w">W</b><b class="w">W</b><b class="d">D</b><b class="w">W</b></span></td><td class="pts">99</td></tr>
+        <tr><td class="pos">2</td><td>🏖️ Sozopol summer offsite</td><td>2</td><td>52</td><td>26.0</td><td><span class="form"><b class="w">W</b><b class="w">W</b><b class="d">D</b><b class="w">W</b><b class="w">W</b></span></td><td class="pts">87</td></tr>
+        <tr><td class="pos">3</td><td>🎄 Christmas party</td><td>1</td><td>38</td><td>38.0</td><td><span class="form"><b class="w">W</b><b class="w">W</b><b class="w">W</b><b class="w">W</b><b class="l">L</b></span></td><td class="pts">76</td></tr>
+        <tr><td class="pos">4</td><td>🔐 Escape room (escaped to bar)</td><td>1</td><td>21</td><td>21.0</td><td><span class="form"><b class="d">D</b><b class="w">W</b><b class="l">L</b><b class="w">W</b><b class="w">W</b></span></td><td class="pts">58</td></tr>
+        <tr><td class="pos">5</td><td>💻 Hackathon</td><td>2</td><td>19</td><td>9.5</td><td><span class="form"><b class="l">L</b><b class="d">D</b><b class="w">W</b><b class="d">D</b><b class="w">W</b></span></td><td class="pts">41</td></tr>
+        <tr><td class="pos">6</td><td>📹 Online quiz (remote, camera off)</td><td>1</td><td>11</td><td>11.0</td><td><span class="form"><b class="l">L</b><b class="l">L</b><b class="d">D</b><b class="l">L</b><b class="w">W</b></span></td><td class="pts">12</td></tr>
+      </table>
+    </div>
+    <div class="league-scroll hidden" id="scorers-wrap"><table class="scorers-table" id="scorers-table"></table></div>
+    <div class="golden-boot" id="golden-boot">👟 GOLDEN BOOT: alex-beleganski — 205 drinks in 6 team buildings (34.2 per event) • 0 assists (never shares the rakia)</div>
+  </div>
+
+  <!-- Match stats -->
+  <div class="section-label">📊 Match Stats <span>— drink types &amp; drinks per ticket processed</span></div>
+  <div class="pitch-card">
+    <div class="pitch-head">ALEX 🥃 vs 🎫 JIRA BACKLOG <span class="live">● FT</span></div>
+    <div class="match-grid">
+      <div class="player-card">
+        <div class="player-rating"><span class="ovr">99</span><span class="posn">JCZ</span><br><span style="font-size:18px">🇧🇬</span></div>
+        <img src="alex-rakia.jpg" alt="Alex" onerror="this.style.visibility='hidden'">
+        <div class="player-name">BELEGANSKI</div>
+        <div class="player-attrs">
+          <span><b>99</b> RAK <small>rakia</small></span>
+          <span><b>87</b> BIR <small>beer</small></span>
+          <span><b>81</b> VIN <small>wine</small></span>
+          <span><b>74</b> MAS <small>mastika</small></span>
+          <span><b>68</b> WHI <small>whisky</small></span>
+          <span><b>03</b> H2O <small>water</small></span>
+        </div>
+      </div>
+
+      <div class="stats-panel">
+        <div class="panel-title">Drink possession</div>
+        <div class="possession" id="possession">
+          <div style="width:58%;background:#ffd700">RAKIA 58%</div>
+          <div style="width:21%;background:#e3b341">BEER 21%</div>
+          <div style="width:11%;background:#ff7b72">11%</div>
+          <div style="width:7%;background:#3fb950">7%</div>
+          <div style="width:2%;background:#c77dff"></div>
+          <div style="width:1%;background:#58a6ff"></div>
+        </div>
+        <div class="possession-legend" id="possession-legend">
+          <span><i style="background:#ffd700"></i>Rakia 58%</span><span><i style="background:#e3b341"></i>Beer 21%</span>
+          <span><i style="background:#ff7b72"></i>Wine 11%</span><span><i style="background:#3fb950"></i>Mastika 7%</span>
+          <span><i style="background:#c77dff"></i>Whisky 2%</span><span><i style="background:#58a6ff"></i>Water 1% (by accident)</span>
+        </div>
+
+        <div class="panel-title" style="margin-top:4px">Head to head</div>
+        <div class="teams-row"><span class="home" id="h2h-home">ALEX</span><span class="away" id="h2h-away">AVG ENGINEER</span></div>
+        <div id="cmp-rows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guestbook -->
+  <div class="section-label hidden" id="guestbook-label">💬 Guestbook <span>— leave a na zdrave for Alex</span></div>
+  <div class="guestbook-card hidden" id="guestbook">
+    <form class="jaas-form hidden" id="gb-form">
+      <label>Your message <textarea name="message" maxlength="280" required placeholder="Na zdrave, Alex! 🥃"></textarea></label>
+      <div class="form-row" style="align-items:center">
+        <div class="form-msg" id="gb-msg"></div>
+        <button class="btn-primary" type="submit" style="flex:0 0 auto">Post</button>
+      </div>
+    </form>
+    <div class="gb-empty hidden" id="gb-signin">
+      <button class="btn-ghost" onclick="openAuth('signin')">Sign in</button> or
+      <button class="btn-ghost" onclick="openAuth('register')">Register</button> to post a message
+    </div>
+    <div class="guestbook-list" id="gb-list"></div>
+  </div>
+
+  <!-- Status page -->
+  <div class="section-label">🛁 Status <span>— status.alex-jaas.dporkov.tech</span></div>
+  <div class="status-card">
+    <div class="status-banner">✓ All jacuzzi systems operational <span>water temp: 38°C</span></div>
+    <div class="status-body" id="status-body">
+      <div class="incidents-title">Past incidents</div>
+      <div class="incident major">
+        <div class="incident-title">🔴 Major outage: Alex detected at desk</div>
+        <div class="incident-text"><b>Investigating</b> — Monitoring reported Alex at his desk during work hours.<br><b>Resolved</b> — False alarm, it was a cardboard cutout. Alex was in the jacuzzi all along.</div>
+        <div class="incident-date">3 days ago • duration: 4 min</div>
+      </div>
+      <div class="incident minor">
+        <div class="incident-title">🟡 Degraded: water temperature dropped to 36°C</div>
+        <div class="incident-text"><b>Mitigated</b> — Added more hot water and more rakia. Temperature back to nominal.</div>
+        <div class="incident-date">2 weeks ago • duration: 12 min</div>
+      </div>
+      <div class="incident maint">
+        <div class="incident-title">🔵 Scheduled maintenance: rakia bottle rotation</div>
+        <div class="incident-text"><b>Completed</b> — Empty bottle replaced with full bottle. Zero downtime, zero sobriety.</div>
+        <div class="incident-date">recurring • every 45 min</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Ticker -->
@@ -639,6 +1044,31 @@ body::before {
   </div>
 </div>
 
+<!-- Auth modal -->
+<div id="auth-modal" onclick="if(event.target===this)closeAuth()">
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button id="tab-signin" onclick="openAuth('signin')">Sign in</button>
+      <button id="tab-register" onclick="openAuth('register')">Register</button>
+    </div>
+    <form class="jaas-form auth-body" id="auth-form">
+      <div class="auth-title hidden" id="auth-title"></div>
+      <label id="username-field">Username <input name="username" autocomplete="username" pattern="[a-zA-Z0-9][a-zA-Z0-9_\-]{2,23}" title="3-24 characters: letters, numbers, _ or -"></label>
+      <label id="email-field">Email <input name="email" type="email" autocomplete="email"></label>
+      <label id="password-field"><span id="password-label">Password</span> <input name="password" type="password" minlength="8" autocomplete="current-password"></label>
+      <button class="btn-primary" type="submit" id="auth-submit">Sign in</button>
+      <div class="form-msg" id="auth-msg"></div>
+      <button class="btn-ghost hidden" type="button" id="auth-resend-btn" onclick="resendConfirmation()">Resend confirmation email</button>
+      <div class="auth-links" id="auth-links-signin">
+        <a href="#" onclick="openAuth('forgot');return false">Forgot password?</a> ·
+        <a href="#" onclick="openAuth('resend');return false">Didn't get the confirmation email?</a>
+      </div>
+      <div class="auth-links hidden" id="auth-links-back"><a href="#" onclick="openAuth('signin');return false">← Back to sign in</a></div>
+      <button class="btn-ghost" type="button" onclick="closeAuth()">Cancel</button>
+    </form>
+  </div>
+</div>
+
 <canvas id="confetti"></canvas>
 
 <script>
@@ -664,6 +1094,98 @@ fetch('https://dporkov.goatcounter.com/counter//.json')
   .then(r => r.json())
   .then(d => { document.getElementById('visit-count').textContent = Number(d.count.replace(/,/g,'')).toLocaleString(); })
   .catch(() => { document.getElementById('visit-count').textContent = '...'; });
+
+// ====== CONTRIBUTION GRAPH ======
+// Seeded PRNG so the graph looks the same on every visit (per day)
+function seededRand(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+(function buildContribGraph(){
+  const grid=document.getElementById('contrib-grid');
+  const months=document.getElementById('contrib-months');
+  const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const today=new Date(); today.setHours(0,0,0,0);
+  const start=new Date(today); start.setDate(start.getDate()-364-start.getDay()); // align to Sunday
+  const rand=seededRand(4269);
+  let total=0, week=0, lastMonth=-1;
+  for(let d=new Date(start); d<=today; d.setDate(d.getDate()+1)){
+    const dow=d.getDay();
+    if(dow===0){
+      if(d.getMonth()!==lastMonth){
+        const m=document.createElement('span');
+        m.style.gridColumn=(week+1)+'';
+        m.textContent=MONTHS[d.getMonth()];
+        months.appendChild(m);
+        lastMonth=d.getMonth();
+      }
+      week++;
+    }
+    // Weekends and Fridays are heavy, summer is heavier, Mondays recovering
+    let base=[0.75,0.35,0.5,0.55,0.6,0.9,0.95][dow];
+    if(d.getMonth()>=5&&d.getMonth()<=8) base+=0.1;
+    const r=rand();
+    const count=r>base?0:Math.round(Math.pow(rand(),1.5)*base*16);
+    total+=count;
+    const lvl=count===0?0:count<3?1:count<6?2:count<10?3:4;
+    const cell=document.createElement('div');
+    cell.className='contrib-cell lvl'+lvl;
+    cell.style.gridRow=(dow+1)+'';
+    cell.style.gridColumn=week+'';
+    cell.title=(count===0?'No rakia (suspicious)':count+' rakia')+' on '+DAYS[dow]+', '+MONTHS[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+    grid.appendChild(cell);
+  }
+  document.getElementById('contrib-total').textContent=total.toLocaleString();
+  const sc=grid.parentElement; sc.scrollLeft=sc.scrollWidth; // show most recent weeks first on small screens
+})();
+
+// ====== STATUS PAGE UPTIME BARS ======
+(function buildUptime(){
+  const body=document.getElementById('status-body');
+  const anchor=body.querySelector('.incidents-title');
+  const rand=seededRand(1337);
+  const COMPONENTS=[
+    { name:'🛁 Jacuzzi',            p:()=>'' },
+    { name:'🥃 Rakia supply',       p:i=>i===62?'warn':'' },
+    { name:'🧍 Standup attendance', p:()=>rand()<0.96?'down':(rand()<0.5?'warn':'') },
+    { name:'💻 Desk presence',      p:()=>'down' },
+  ];
+  COMPONENTS.forEach(c=>{
+    const states=Array.from({length:90},(_,i)=>c.p(i));
+    const up=states.filter(s=>s==='').length + states.filter(s=>s==='warn').length*0.5;
+    const pct=(up/90*100);
+    const color=pct>99?'#3fb950':pct>50?'#e3b341':'#ff7b72';
+    const row=document.createElement('div');
+    row.innerHTML=
+      `<div class="uptime-row-head"><span>${c.name}</span><span class="pct" style="color:${color}">${pct.toFixed(2)}% uptime</span></div>`+
+      `<div class="uptime-bars">${states.map((s,i)=>`<i class="${s}" title="${90-i} days ago: ${s==='down'?'outage':s==='warn'?'degraded':'operational'}"></i>`).join('')}</div>`+
+      `<div class="uptime-foot"><span>90 days ago</span><span>today</span></div>`;
+    body.insertBefore(row,anchor);
+  });
+})();
+
+// ====== MATCH STATS (head to head) ======
+(function buildMatchStats(){
+  const STATS=[
+    { label:'🎫 Tickets processed',           home:3,    away:41 },
+    { label:'🥃 Drinks per ticket processed', home:47.3, away:0.2 },
+    { label:'⚽ xD (expected drinks)',         home:142,  away:8 },
+    { label:'🎯 Shots on target (rakia)',     home:118,  away:5 },
+    { label:'🧍 Standups attended',           home:0,    away:58 },
+    { label:'🟨 Yellow cards (HR tickets)',   home:12,   away:0 },
+  ];
+  const wrap=document.getElementById('cmp-rows');
+  STATS.forEach(s=>{
+    const max=Math.max(s.home,s.away)||1;
+    const row=document.createElement('div');
+    row.className='cmp-row';
+    row.innerHTML=
+      `<span class="cmp-val home">${s.home}</span>`+
+      `<div class="cmp-mid"><div class="cmp-label">${s.label}</div>`+
+      `<div class="cmp-bars"><span class="h"><i style="width:${s.home/max*100}%"></i></span><span class="a"><i style="width:${s.away/max*100}%"></i></span></div></div>`+
+      `<span class="cmp-val away">${s.away}</span>`;
+    wrap.appendChild(row);
+  });
+  wrap.style.cssText='display:flex;flex-direction:column;gap:9px';
+})();
 
 // ====== LIVE STATUS CYCLING ======
 const STATUSES = [
@@ -782,7 +1304,7 @@ function startTerminal() {
   const progText=document.getElementById('progress-text');
   const deployBtn=document.getElementById('deploy-btn');
   const scene1el=document.getElementById('scene1');
-  function scrollTerm(){ scene1el.scrollTop=scene1el.scrollHeight; }
+  function scrollTerm(){ deployBtn.scrollIntoView({block:'nearest'}); }
 
   let i=0;
   const typer=setInterval(()=>{
@@ -977,6 +1499,289 @@ function animateConfetti(){
   else ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 function stopConfetti(){ confettiRunning=false; }
+
+// ====== SUPABASE: accounts, league, guestbook ======
+// Static demo mode when config.js is empty or the library failed to load.
+const CFG = window.JAAS_CONFIG || {};
+const sb = (CFG.supabaseUrl && CFG.supabaseKey && window.supabase)
+  ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey) : null;
+let me = null; // { id, username }
+
+const DRINK_META = {
+  rakia:{label:'Rakia',color:'#ffd700'}, beer:{label:'Beer',color:'#e3b341'}, wine:{label:'Wine',color:'#ff7b72'},
+  mastika:{label:'Mastika',color:'#3fb950'}, whisky:{label:'Whisky',color:'#c77dff'}, water:{label:'Water',color:'#58a6ff'},
+  other:{label:'Other',color:'#8b949e'},
+};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function setMsg(id, text, ok){ const el=document.getElementById(id); el.textContent=text||''; el.className='form-msg '+(ok?'ok':'err'); }
+function timeAgo(ts){
+  const s=Math.max(1,Math.floor((Date.now()-new Date(ts))/1000));
+  for (const [n,u] of [[86400,'d'],[3600,'h'],[60,'m']]) if (s>=n) return Math.floor(s/n)+u+' ago';
+  return s+'s ago';
+}
+
+// ---- auth ----
+// modes: signin | register | forgot (send reset link) | resend (confirmation email) | reset (set new password)
+const AUTH_MODES = {
+  signin:   { fields:['email','password'],             submit:'Sign in' },
+  register: { fields:['username','email','password'],  submit:'Create account' },
+  forgot:   { fields:['email'], submit:'Send reset link',
+              title:'Reset your password', hint:'We will email you a link to set a new password.' },
+  resend:   { fields:['email'], submit:'Resend confirmation email',
+              title:'Resend confirmation email', hint:'Use the email you registered with.' },
+  reset:    { fields:['password'], submit:'Save new password',
+              title:'Set a new password', hint:'At least 8 characters.' },
+};
+const redirectUrl = () => location.origin + location.pathname;
+let authMode='signin';
+
+function openAuth(mode){
+  if(!sb) return;
+  const m=AUTH_MODES[mode], f=document.getElementById('auth-form');
+  authMode=mode;
+  document.getElementById('auth-modal').classList.add('show');
+  document.querySelector('.auth-tabs').classList.toggle('hidden', !!m.title);
+  document.getElementById('tab-signin').classList.toggle('active', mode==='signin');
+  document.getElementById('tab-register').classList.toggle('active', mode==='register');
+  const title=document.getElementById('auth-title');
+  title.classList.toggle('hidden', !m.title);
+  title.innerHTML = m.title ? `${esc(m.title)}<small>${esc(m.hint)}</small>` : '';
+  for (const name of ['username','email','password']) {
+    const on=m.fields.includes(name);
+    document.getElementById(name+'-field').classList.toggle('hidden', !on);
+    f[name].required=on;
+  }
+  f.password.autocomplete = (mode==='register'||mode==='reset') ? 'new-password' : 'current-password';
+  document.getElementById('password-label').textContent = mode==='reset' ? 'New password' : 'Password';
+  document.getElementById('auth-submit').textContent = m.submit;
+  document.getElementById('auth-links-signin').classList.toggle('hidden', mode!=='signin');
+  document.getElementById('auth-links-back').classList.toggle('hidden', mode==='signin'||mode==='register'||mode==='reset');
+  document.getElementById('auth-resend-btn').classList.add('hidden');
+  setMsg('auth-msg','');
+}
+function closeAuth(){ document.getElementById('auth-modal').classList.remove('show'); }
+async function signOut(){ if(sb) await sb.auth.signOut(); }
+
+// Offer a one-click resend after registering or when sign-in says the email isn't confirmed
+function offerResend(){ document.getElementById('auth-resend-btn').classList.remove('hidden'); }
+async function resendConfirmation(){
+  const email=document.getElementById('auth-form').email.value.trim();
+  if(!email){ openAuth('resend'); return; }
+  const btn=document.getElementById('auth-resend-btn'); btn.disabled=true;
+  try {
+    const { error } = await sb.auth.resend({ type:'signup', email, options:{ emailRedirectTo: redirectUrl() } });
+    if(error) throw error;
+    setMsg('auth-msg', `✓ Confirmation email sent to ${email}. Check your inbox and spam folder.`, true);
+  } catch(err){ setMsg('auth-msg', '✗ '+(err.message||'Could not resend the email')); }
+  finally { btn.disabled=false; }
+}
+
+document.getElementById('auth-form').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const f=e.target, btn=document.getElementById('auth-submit');
+  const email=f.email.value.trim(), password=f.password.value;
+  btn.disabled=true; setMsg('auth-msg','');
+  try {
+    if(authMode==='register'){
+      const username=f.username.value.trim().toLowerCase();
+      const { data: taken, error: checkErr } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+      if(checkErr) throw new Error('Registration is not available right now. Try again later.');
+      if(taken) throw new Error('Username already taken');
+      const { data, error } = await sb.auth.signUp({ email, password,
+        options:{ data:{ username }, emailRedirectTo: redirectUrl() } });
+      if(error) throw error;
+      if(!data.session){
+        setMsg('auth-msg','✓ Account created. Check your email to confirm, then sign in.', true);
+        offerResend(); return;
+      }
+    } else if(authMode==='signin'){
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error){
+        if(error.code==='email_not_confirmed' || /not confirmed/i.test(error.message)){
+          setMsg('auth-msg','✗ Your email is not confirmed yet. Check your inbox or resend the email.');
+          offerResend(); return;
+        }
+        throw error;
+      }
+    } else if(authMode==='forgot'){
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl() });
+      if(error) throw error;
+      // Same message whether or not the account exists, so the form can't be used to probe emails
+      setMsg('auth-msg', `✓ If an account exists for ${email}, a reset link is on its way.`, true); return;
+    } else if(authMode==='resend'){
+      const { error } = await sb.auth.resend({ type:'signup', email, options:{ emailRedirectTo: redirectUrl() } });
+      if(error) throw error;
+      setMsg('auth-msg', `✓ If ${email} is waiting for confirmation, a new email is on its way.`, true); return;
+    } else if(authMode==='reset'){
+      const { error } = await sb.auth.updateUser({ password });
+      if(error) throw error;
+      f.reset(); setMsg('auth-msg', '✓ Password updated. You are signed in.', true);
+      setTimeout(closeAuth, 1500); return;
+    }
+    f.reset(); closeAuth();
+  } catch(err){
+    setMsg('auth-msg', '✗ '+(err.message||'Something went wrong'));
+  } finally { btn.disabled=false; }
+});
+
+async function onSession(session){
+  me=null;
+  if(session){
+    const { data } = await sb.from('profiles').select('id,username').eq('id', session.user.id).maybeSingle();
+    me = data || { id: session.user.id, username: session.user.email };
+  }
+  document.getElementById('signin-btn').classList.toggle('hidden', !!me);
+  document.getElementById('signout-btn').classList.toggle('hidden', !me);
+  const chip=document.getElementById('user-chip');
+  chip.classList.toggle('hidden', !me); chip.textContent = me ? '@'+me.username : '';
+  document.getElementById('locker').classList.toggle('hidden', !me);
+  document.getElementById('locker-me').textContent = me ? 'playing as @'+me.username : '';
+  document.getElementById('gb-form').classList.toggle('hidden', !me);
+  document.getElementById('gb-signin').classList.toggle('hidden', !!me);
+  loadAll();
+}
+
+// ---- data: league, scorers, possession, head-to-head ----
+async function loadLeague(){
+  const [lt, ps] = await Promise.all([
+    sb.from('league_table').select('*').order('drinks',{ascending:false}),
+    sb.from('player_stats').select('*').order('drinks',{ascending:false}).limit(10),
+  ]);
+  if(lt.error||ps.error) throw (lt.error||ps.error);
+  const tbs=lt.data, players=ps.data.filter(p=>p.drinks>0||p.tickets>0);
+
+  const sel=document.getElementById('tb-select'), cur=sel.value;
+  sel.innerHTML='<option value="">— regular work day —</option>'+
+    tbs.map(t=>`<option value="${t.id}">${esc(t.emoji)} ${esc(t.name)}</option>`).join('');
+  sel.value=cur;
+
+  if(!tbs.length && !players.length) return; // nothing logged yet: keep the demo table
+  document.getElementById('league-badge').textContent='● LIVE';
+  document.getElementById('league-badge').classList.add('live');
+  document.getElementById('league-table').innerHTML =
+    '<tr><th>#</th><th>Team building</th><th>Days</th><th>🥃 Drinks</th><th>Per day</th><th>Players</th></tr>'+
+    (tbs.length ? tbs.map((t,i)=>`<tr><td class="pos">${i+1}</td><td>${esc(t.emoji)} ${esc(t.name)}</td><td>${t.days}</td><td>${t.drinks}</td><td>${t.per_day}</td><td class="pts">${t.players}</td></tr>`).join('')
+                : '<tr><td colspan="6" style="color:#8b949e">No team buildings yet. Add one in the locker room.</td></tr>');
+
+  const wrap=document.getElementById('scorers-wrap');
+  wrap.classList.toggle('hidden', !players.length);
+  document.getElementById('scorers-table').innerHTML =
+    '<tr><th>#</th><th>Top scorers</th><th>🥃 Drinks</th><th>🎫 Tickets</th><th>Drinks / ticket</th></tr>'+
+    players.map((p,i)=>`<tr class="${me&&p.id===me.id?'me':''}"><td class="pos">${i+1}</td><td>@${esc(p.username)}</td><td>${p.drinks}</td><td>${p.tickets}</td><td>${p.drinks_per_ticket ?? '∞'}</td></tr>`).join('');
+  if(players.length){
+    const top=players[0], total=players.reduce((a,p)=>a+p.drinks,0);
+    document.getElementById('golden-boot').textContent =
+      `👟 GOLDEN BOOT: @${top.username} — ${top.drinks} drinks • league total: ${total} drinks across ${players.length} players`;
+    renderHeadToHead(players);
+  }
+}
+
+function renderHeadToHead(players){
+  const mine = me && players.find(p=>p.id===me.id);
+  const home = mine || players[0];
+  const others = players.filter(p=>p.id!==home.id);
+  if(!others.length) return; // nothing to compare against yet
+  const avg = k => +(others.reduce((a,p)=>a+(+p[k]||0),0)/others.length).toFixed(1);
+  const dpt = p => p.tickets ? +(p.drinks/p.tickets).toFixed(1) : p.drinks;
+  document.getElementById('h2h-home').textContent = '@'+home.username.toUpperCase();
+  document.getElementById('h2h-away').textContent = 'LEAGUE AVG';
+  const rows=[
+    { label:'🎫 Tickets processed',           home:home.tickets, away:avg('tickets') },
+    { label:'🥃 Drinks',                       home:home.drinks,  away:avg('drinks') },
+    { label:'🥃 Drinks per ticket processed', home:dpt(home),    away:+(others.reduce((a,p)=>a+dpt(p),0)/others.length).toFixed(1) },
+  ];
+  document.getElementById('cmp-rows').innerHTML = rows.map(s=>{
+    const max=Math.max(s.home,s.away)||1;
+    return `<div class="cmp-row"><span class="cmp-val home">${s.home}</span><div class="cmp-mid"><div class="cmp-label">${s.label}</div>`+
+      `<div class="cmp-bars"><span class="h"><i style="width:${s.home/max*100}%"></i></span><span class="a"><i style="width:${s.away/max*100}%"></i></span></div></div>`+
+      `<span class="cmp-val away">${s.away}</span></div>`;
+  }).join('');
+}
+
+async function loadPossession(){
+  const { data, error } = await sb.from('drink_type_stats').select('*').order('drinks',{ascending:false});
+  if(error) throw error;
+  const total=data.reduce((a,r)=>a+r.drinks,0);
+  if(!total) return; // keep demo bar
+  const pct=r=>Math.round(r.drinks/total*100);
+  document.getElementById('possession').innerHTML = data.map(r=>{
+    const m=DRINK_META[r.drink_type]||DRINK_META.other, p=pct(r);
+    return `<div style="width:${r.drinks/total*100}%;background:${m.color}">${p>=12?m.label.toUpperCase()+' ':''}${p>=6?p+'%':''}</div>`;
+  }).join('');
+  document.getElementById('possession-legend').innerHTML = data.map(r=>{
+    const m=DRINK_META[r.drink_type]||DRINK_META.other;
+    return `<span><i style="background:${m.color}"></i>${m.label} ${pct(r)}%</span>`;
+  }).join('');
+}
+
+// ---- guestbook ----
+async function loadGuestbook(){
+  const { data, error } = await sb.from('guestbook_feed').select('*').order('created_at',{ascending:false}).limit(50);
+  if(error) throw error;
+  document.getElementById('gb-list').innerHTML = data.length
+    ? data.map(g=>`<div class="gb-item"><div class="gb-meta"><strong>@${esc(g.username)}</strong> ${timeAgo(g.created_at)}`+
+        (me&&g.user_id===me.id?`<button class="gb-del" title="Delete" onclick="deleteMessage(${g.id})">✕</button>`:'')+
+        `</div><div class="gb-msg">${esc(g.message)}</div></div>`).join('')
+    : '<div class="gb-empty">No messages yet. Be the first to say na zdrave 🥃</div>';
+}
+async function deleteMessage(id){
+  const { error } = await sb.from('guestbook').delete().eq('id', id);
+  if(!error) loadGuestbook();
+}
+
+async function loadAll(){
+  try { await Promise.all([loadLeague(), loadPossession(), loadGuestbook()]); }
+  catch(err){ console.warn('Supabase load failed, keeping demo data:', err.message||err); }
+}
+
+// ---- writes ----
+function bindForm(formId, msgId, handler){
+  document.getElementById(formId).addEventListener('submit', async e=>{
+    e.preventDefault();
+    const btn=e.target.querySelector('button[type=submit]'); btn.disabled=true; setMsg(msgId,'');
+    try { const ok=await handler(e.target); setMsg(msgId, ok, true); loadAll(); }
+    catch(err){ setMsg(msgId, '✗ '+(err.message||'Something went wrong')); }
+    finally { btn.disabled=false; }
+  });
+}
+const must = ({ error }) => { if(error) throw error; };
+
+bindForm('drink-form','drink-msg', async f=>{
+  const quantity=+f.quantity.value;
+  must(await sb.from('drink_logs').insert({ drink_type:f.drink_type.value, quantity,
+    team_building_id: f.team_building_id.value ? +f.team_building_id.value : null }));
+  playSound('splash');
+  return `✓ ${quantity} × ${f.drink_type.options[f.drink_type.selectedIndex].text} logged. Na zdrave!`;
+});
+bindForm('ticket-form','ticket-msg', async f=>{
+  must(await sb.from('ticket_logs').insert({ tickets:+f.tickets.value }));
+  return `✓ ${f.tickets.value} ticket(s) logged. Suspiciously productive.`;
+});
+bindForm('tb-form','tb-msg', async f=>{
+  must(await sb.from('team_buildings').insert({ name:f.name.value.trim(), emoji:f.emoji.value.trim()||'🍻', days:+f.days.value }));
+  const name=f.name.value.trim(); f.reset();
+  return `✓ "${name}" added to the league`;
+});
+bindForm('gb-form','gb-msg', async f=>{
+  must(await sb.from('guestbook').insert({ message:f.message.value.trim() }));
+  f.reset();
+  return '✓ Posted';
+});
+
+if(sb){
+  document.getElementById('signin-btn').classList.remove('hidden');
+  document.getElementById('guestbook-label').classList.remove('hidden');
+  document.getElementById('guestbook').classList.remove('hidden');
+  document.getElementById('gb-signin').classList.remove('hidden');
+  // Supabase recommends not awaiting other Supabase calls inside this callback
+  sb.auth.onAuthStateChange((event, session)=>{
+    setTimeout(()=>{
+      onSession(session);
+      // Arrived from a "reset password" email link: ask for the new password
+      if(event==='PASSWORD_RECOVERY') openAuth('reset');
+    }, 0);
+  });
+}
 </script>
 </body>
 </html>
