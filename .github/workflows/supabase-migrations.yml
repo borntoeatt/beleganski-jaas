@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - 'supabase/migrations/**'
+  # PRs only do a dry run: checks token permissions + DB password, lists pending migrations
+  pull_request:
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/supabase-migrations.yml'
   workflow_dispatch:
 
 concurrency:
@@ -38,5 +43,10 @@ jobs:
       - name: Link project
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
 
+      - name: Dry run (pull requests)
+        if: github.event_name == 'pull_request'
+        run: supabase db push --dry-run
+
       - name: Apply migrations
+        if: github.event_name != 'pull_request'
         run: supabase db push
