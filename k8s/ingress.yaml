@@ -10,7 +10,7 @@ metadata:
     gethomepage.dev/group: "Apps"
     gethomepage.dev/icon: "mdi-account-tie"
     gethomepage.dev/href: "https://alex-jaas.dporkov.tech"
-    gethomepage.dev/siteMonitor: "http://beleganski-jaas.beleganski-jaas.svc.cluster.local"
+    gethomepage.dev/siteMonitor: "http://beleganski-jaas.default.svc.cluster.local"
 spec:
   ingressClassName: traefik
   rules:
