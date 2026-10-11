@@ -42,7 +42,7 @@ Click the rakia glass. You know what to do.
 |-------|-----------|
 | Frontend | [Astro](https://astro.build) 7, static output (still no framework at runtime, legends only) |
 | Database / Auth | Supabase (hosted Postgres + Auth, RLS) |
-| Container | node:22-alpine (build) → nginx:1.30-alpine-slim (serve) |
+| Container | node:22-alpine (build) → nginx-unprivileged:1.30-alpine-slim (serve, non-root uid 101, port 8080, read-only FS) |
 | Registry | Docker Hub (`dporkov/beleganski-jaas`) |
 | Orchestration | k3s |
 | GitOps | ArgoCD |
@@ -86,7 +86,7 @@ Or the same way production runs it:
 
 ```bash
 docker build -t beleganski-jaas:dev .
-docker run --rm -p 8080:80 beleganski-jaas:dev
+docker run --rm -p 8080:8080 beleganski-jaas:dev
 ```
 
 ### Project structure
