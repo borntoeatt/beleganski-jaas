@@ -10,4 +10,4 @@ resources:
 # CI updates newTag after each image build (only this file is committed by CI)
 images:
   - name: dporkov/beleganski-jaas
-    newTag: 969dbc52e1c4ddc5bc774b38c1a954c5454f5ba6
+    newTag: 77405e69f4ce25f3a0111b335ccb4265b83c9dfe
