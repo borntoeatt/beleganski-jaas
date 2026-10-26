@@ -110,7 +110,8 @@ supabase/migrations/     database schema (applied by CI)
 # Apply ArgoCD app
 kubectl apply -f https://raw.githubusercontent.com/borntoeatt/beleganski-jaas/main/argocd/argocd-app.yaml
 
-# Or manually (Kustomize: applies deployment, service, ingress, PDB with the current image tag)
+# Or manually (Kustomize: deployment, service, ingress, PDB into the beleganski-jaas namespace)
+kubectl create namespace beleganski-jaas
 kubectl apply -k k8s/
 ```
 
