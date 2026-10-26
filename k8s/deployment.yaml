@@ -28,6 +28,9 @@ spec:
               app: beleganski-jaas
       automountServiceAccountToken: false
       securityContext:
+        runAsNonRoot: true
+        runAsUser: 101            # nginx user in nginx-unprivileged
+        runAsGroup: 101
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -36,8 +39,6 @@ spec:
           image: dporkov/beleganski-jaas
           ports:
             - name: http
-              containerPort: 80
-            - name: http-alt          # same site; the Service moves here when switching to non-root nginx
               containerPort: 8080
           readinessProbe:
             httpGet:
@@ -54,6 +55,9 @@ spec:
             failureThreshold: 3
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
           resources:
             requests:
               memory: "32Mi"
@@ -61,3 +65,11 @@ spec:
             limits:
               memory: "64Mi"
               cpu: "50m"
+          volumeMounts:
+            - name: tmp               # nginx pid + temp files (read-only root FS)
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi
