@@ -1,6 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# Every resource goes to this namespace, whether applied by ArgoCD or `kubectl apply -k`
+namespace: beleganski-jaas
+
 resources:
   - deployment.yaml
   - service.yaml
