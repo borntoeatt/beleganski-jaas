@@ -9,6 +9,7 @@ resources:
   - service.yaml
   - ingress.yaml
   - pdb.yaml
+  - networkpolicy.yaml
 
 # CI updates newTag after each image build (only this file is committed by CI)
 images:
