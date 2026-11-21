@@ -1,0 +1,52 @@
+# The site is public (Cloudflare -> Nginx Proxy Manager -> Traefik -> these
+# pods), so a bug in it must not reach the rest of the cluster or the LAN.
+# In: Traefik, and the Homepage dashboard's status check. Out: nothing.
+# Enforced by k3s' built-in policy controller (kube-router); kubelet probes
+# come from the pod's own node and are not affected.
+#
+# The pods are nginx serving static files: they open no connections of their
+# own (no proxy_pass, no resolver), so there is no egress rule, not even DNS.
+# Supabase is called by the visitor's browser, not by these pods. If the
+# container ever starts calling something, add the rule here in the same PR.
+#
+# The Service is still a NodePort (see service.yaml). With this policy a
+# connection to the node port is dropped unless it arrives on the node that
+# runs the pod; in about 20 hours of access logs read on 2026-11-21 every
+# request came from Traefik or the kubelet, none through the node port.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: beleganski-jaas
+  labels:
+    app: beleganski-jaas
+spec:
+  podSelector:
+    matchLabels:
+      app: beleganski-jaas
+  policyTypes: ["Ingress", "Egress"]
+  ingress:
+    # Traefik, for alex-jaas.dporkov.tech (ingress.yaml).
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Homepage's status dot: the gethomepage.dev/siteMonitor annotation in
+    # ingress.yaml points at this Service, and Homepage's pod makes the call.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: homepage
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: homepage
+      ports:
+        - protocol: TCP
+          port: 8080
+  # No rule: all egress is denied.
+  egress: []
